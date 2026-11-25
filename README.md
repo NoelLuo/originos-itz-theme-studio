@@ -16,8 +16,8 @@
 - **全系统设置 / 卡包头像开关按钮 (`VMoveBoolButton`)**
   - 一键上传角色头像生成开关开启/关闭态轨道（`vivo/vigour_bool_btn_bg_on_light.png` / `off_light.png` / `hand_normal_light.9.png`），并自动将默认竖杠/圆圈置透，避免遮挡头像。
 - **控制中心 & 音量面板 (`com.vivo.systemuiplugin`)**
-  - 支持一键生成**透明底防纯色球字形**（Wi-Fi / 移动数据 / 蓝牙 / 音量图标，规避 Android `SRC_IN` 染成实心球问题）。
-  - 拾色器可视化修改控制中心主色与 OriginOS 7 `vivo_volume_whole_theme_*` 音量配色。
+  - 支持一键生成**透明底防纯色球字形**（Wi-Fi / 移动数据 / 蓝牙 / 音量图标，规避 Android `SRC_IN` 染成实心球问题），同时服务端自动识别 `RIFF....WEBP` 动图 WebP 文件头以支持全彩 `AnimatedImageDrawable` 图标预览。
+  - 拾色器可视化修改控制中心主色与 OriginOS 7 音量条完整配色（自动写入 `<bool name="new_style">true</bool>`、`vigour_color_track_gradient_startcolor` 及展开面板 4 条轨道底色，真机实测生效）。
 - **短信气泡与防变形智能卡片 (`com.android.mms`)**
   - 一键生成左右聊天气泡与防拉伸变形的 `sms_card_view_bg.9.png` 智能通知卡片，也支持直接上传自定义插画气泡。
 - **锁屏原生组件 (`com.android.systemui` + `com.vivo.systemuiplugin`)**
@@ -57,17 +57,36 @@ Windows 用户也可直接双击 `start.bat`。启动后会自动在浏览器打
 
 ---
 
+## 内置 Agent Skill（AI 协作技能包）
+
+仓库自带开箱即用的跨端 Agent Skill：[`originos-itz-theme`](.agents/skills/originos-itz-theme/SKILL.md)（遵循 `.agents/skills/<name>/SKILL.md` 规范，克隆本仓库后可被 Antigravity / Codex 等 AI 编程代理自动发现）：
+
+- [`.agents/skills/originos-itz-theme/SKILL.md`](.agents/skills/originos-itz-theme/SKILL.md)：OriginOS 7 `.itz` 主题开发、排障、自动打包与推送完整工作流与铁律清单
+- [`.agents/skills/originos-itz-theme/references/originos7-architecture.md`](.agents/skills/originos-itz-theme/references/originos7-architecture.md)：实机逆向验证的 OriginOS 7 底层机制（`0 npTc` 点九图、超级卡包 141 枚 AAPT2 混淆名、音量 `new_style` 开关、控制中心动图 WebP 全彩绕过 `setTint`、`VMoveBoolButton` 头像开关、卸载弹窗等）
+- [`.agents/skills/originos-itz-theme/references/asset-specs.md`](.agents/skills/originos-itz-theme/references/asset-specs.md)：全模块像素尺寸、安全边距与美术出图规范
+- [`.agents/skills/originos-itz-theme/scripts/verify_itz.py`](.agents/skills/originos-itz-theme/scripts/verify_itz.py)：零第三方依赖的主题包 & 替换包一键体检脚本
+
+```bash
+python .agents/skills/originos-itz-theme/scripts/verify_itz.py path/to/theme.itz
+python .agents/skills/originos-itz-theme/scripts/verify_itz.py path/to/replacement_pack.itz --replacement-pack
+```
+
+---
+
 ## 项目结构
 
 ```text
 .
-├── server.py               # 本地 Web GUI 服务端（零第三方 Web 框架依赖）
-├── itz_engine.py           # .itz 解析、打包、OriginOS 7 资源生成与替换包合并核心
-├── apk_icon_extractor.py   # ADB 批量提取手机原版应用图标（无需完整拉取 APK）
-├── supercard_obf_map.json  # OriginOS 7 SuperCard.apk AAPT2 混淆名与原尺寸映射表
+├── .agents/
+│   └── skills/
+│       └── originos-itz-theme/  # 内置 OriginOS 7 主题开发 Agent Skill 与自动校验脚本
+├── server.py                    # 本地 Web GUI 服务端（零第三方 Web 框架依赖）
+├── itz_engine.py                # .itz 解析、打包、OriginOS 7 资源生成与替换包合并核心
+├── apk_icon_extractor.py        # ADB 批量提取手机原版应用图标（无需完整拉取 APK）
+├── supercard_obf_map.json       # OriginOS 7 SuperCard.apk AAPT2 混淆名与原尺寸映射表
 ├── static/
-│   └── index.html          # 可视化工作台、真机实时模拟预览前端
-├── start.bat               # Windows 一键启动脚本
+│   └── index.html               # 可视化工作台、真机实时模拟预览前端
+├── start.bat                    # Windows 一键启动脚本
 ├── requirements.txt
 └── LICENSE
 ```

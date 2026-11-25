@@ -744,56 +744,77 @@ def make_card_crop(raw_bytes: bytes, w: int = 960, h: int = 600, radius: int = 3
 
 
 
-def make_volume_glyph_icon(kind: str = "media", color: tuple[int, int, int, int] = (38, 108, 124, 255), size: int = 84) -> bytes:
-    """Draw a crisp transparent-BG volume glyph (survives Android SRC_IN tint cleanly)."""
-    scale = 4
-    s = size * scale
-    im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    lw = max(8, int(s * 0.068))
+DEFAULT_VOLUME_ICON_LIGHT = "#54253e"
+DEFAULT_VOLUME_ICON_DARK = "#9c6480"
+
+
+def make_volume_glyph_icon(
+    kind: str = "media",
+    color: tuple[int, int, int, int] = (*_hex_to_rgb(DEFAULT_VOLUME_ICON_LIGHT), 255),
+    size: int = 84,
+) -> bytes:
+    """Draw a rounded, single-color glyph for the system's SRC_IN tint."""
+    s = size * 4
+    unit = s / 24
+    mask = Image.new("L", (s, s))
+    draw = ImageDraw.Draw(mask)
+    opacity = color[3]
+    width = max(1, round(2.15 * unit))
+    cap = width / 2
+
+    def dot(x: float, y: float) -> None:
+        x, y = x * unit, y * unit
+        draw.ellipse((x - cap, y - cap, x + cap, y + cap), fill=opacity)
+
+    def stroke(*points: tuple[float, float]) -> None:
+        draw.line([(x * unit, y * unit) for x, y in points], fill=opacity, width=width)
+        for x, y in points:
+            dot(x, y)
+
+    def arc(cx: float, cy: float, radius: float, start: int, end: int) -> None:
+        outer = radius + cap / unit
+        draw.arc(
+            tuple(v * unit for v in (cx - outer, cy - outer, cx + outer, cy + outer)),
+            start, end, fill=opacity, width=width,
+        )
+        for angle in (math.radians(start), math.radians(end)):
+            dot(cx + radius * math.cos(angle), cy + radius * math.sin(angle))
 
     if kind in ("media", "media_mute"):
-        # Speaker cone
-        cone = [
-            (s * 0.16, s * 0.39),
-            (s * 0.34, s * 0.39),
-            (s * 0.54, s * 0.22),
-            (s * 0.54, s * 0.78),
-            (s * 0.34, s * 0.61),
-            (s * 0.16, s * 0.61),
-        ]
-        d.polygon(cone, fill=color)
+        stroke((4, 9), (7.5, 9), (12, 5.5), (12, 18.5), (7.5, 15), (4, 15), (4, 9))
         if kind == "media":
-            d.arc([s * 0.44, s * 0.34, s * 0.74, s * 0.66], start=-50, end=50, fill=color, width=lw)
-            d.arc([s * 0.42, s * 0.22, s * 0.86, s * 0.78], start=-55, end=55, fill=color, width=lw)
+            arc(12, 12, 4.9, -38, 38)
+            arc(12, 12, 8.6, -43, 43)
         else:
-            d.line([(s * 0.64, s * 0.36), (s * 0.86, s * 0.64)], fill=color, width=lw)
-            d.line([(s * 0.86, s * 0.36), (s * 0.64, s * 0.64)], fill=color, width=lw)
+            stroke((16, 9.5), (21, 14.5))
+            stroke((21, 9.5), (16, 14.5))
     elif kind in ("ring", "ring_mute"):
-        # Bell silhouette
-        d.pieslice([s * 0.26, s * 0.20, s * 0.74, s * 0.68], start=180, end=360, fill=color)
-        d.rectangle([s * 0.26, s * 0.42, s * 0.74, s * 0.68], fill=color)
-        d.rounded_rectangle([s * 0.18, s * 0.62, s * 0.82, s * 0.72], radius=lw // 2, fill=color)
-        d.ellipse([s * 0.42, s * 0.72, s * 0.58, s * 0.84], fill=color)
+        arc(12, 10, 5, 180, 360)
+        stroke((7, 10), (7, 13), (4.5, 17), (19.5, 17), (17, 13), (17, 10))
+        stroke((12, 4), (12, 5))
+        dot(12, 20.5)
         if kind == "ring_mute":
-            d.line([(s * 0.20, s * 0.20), (s * 0.82, s * 0.82)], fill=(255, 255, 255, 0), width=lw + 6)
-            d.line([(s * 0.22, s * 0.22), (s * 0.80, s * 0.80)], fill=color, width=lw)
+            draw.line([(3 * unit, 3 * unit), (21 * unit, 21 * unit)], fill=0, width=width * 2)
+            stroke((3.5, 3.5), (20.5, 20.5))
     elif kind in ("noti", "noti_mute"):
-        # Chat / notification bubble
-        d.rounded_rectangle([s * 0.16, s * 0.20, s * 0.84, s * 0.68], radius=int(s * 0.14), fill=color)
-        d.polygon([(s * 0.30, s * 0.66), (s * 0.24, s * 0.84), (s * 0.48, s * 0.66)], fill=color)
-        d.ellipse([s * 0.30, s * 0.40, s * 0.38, s * 0.48], fill=(255, 255, 255, 0))
-        d.ellipse([s * 0.46, s * 0.40, s * 0.54, s * 0.48], fill=(255, 255, 255, 0))
-        d.ellipse([s * 0.62, s * 0.40, s * 0.70, s * 0.48], fill=(255, 255, 255, 0))
+        arc(6.5, 7.5, 3, 180, 270)
+        arc(17.5, 7.5, 3, 270, 360)
+        arc(17.5, 14.5, 3, 0, 90)
+        stroke((6.5, 4.5), (17.5, 4.5))
+        stroke((20.5, 7.5), (20.5, 14.5))
+        stroke((3.5, 7.5), (3.5, 20), (8, 17.5), (17.5, 17.5))
+        stroke((8, 9), (16, 9))
+        stroke((8, 13), (13, 13))
     else:
-        # Alarm clock
-        d.ellipse([s * 0.20, s * 0.24, s * 0.80, s * 0.84], outline=color, width=lw)
-        d.line([(s * 0.50, s * 0.54), (s * 0.50, s * 0.36)], fill=color, width=lw)
-        d.line([(s * 0.50, s * 0.54), (s * 0.64, s * 0.60)], fill=color, width=lw)
-        d.arc([s * 0.14, s * 0.14, s * 0.38, s * 0.36], start=130, end=290, fill=color, width=lw)
-        d.arc([s * 0.62, s * 0.14, s * 0.86, s * 0.36], start=250, end=50, fill=color, width=lw)
+        draw.ellipse(tuple(v * unit for v in (4.5, 5.5, 19.5, 20.5)), outline=opacity, width=width)
+        stroke((12, 9.5), (12, 13), (14.5, 14.5))
+        stroke((3.5, 6), (6.5, 3.5))
+        stroke((17.5, 3.5), (20.5, 6))
+        stroke((7.8, 18.7), (6.5, 21))
+        stroke((16.2, 18.7), (17.5, 21))
 
-    out = im.resize((size, size), Image.Resampling.LANCZOS)
+    out = Image.new("RGBA", (size, size), color)
+    out.putalpha(mask.resize((size, size), Image.Resampling.LANCZOS))
     buf = io.BytesIO()
     out.save(buf, format="PNG")
     return buf.getvalue()
@@ -1752,7 +1773,8 @@ class ThemeProject:
             "battery_text_white": "#000000",
             "volume_progress_color": "#98d7e1",
             "volume_bg_color": "#e4f4f7",
-            "volume_icon_color": "#266c7c",
+            "volume_icon_color": DEFAULT_VOLUME_ICON_LIGHT,
+            "volume_icon_color_dark": DEFAULT_VOLUME_ICON_DARK,
         }
         for mod_name, mapping in (
             (
@@ -1762,6 +1784,7 @@ class ThemeProject:
                     "vivo_volume_whole_theme_progress_color_light": "volume_progress_color",
                     "vivo_volume_whole_theme_background_color_light": "volume_bg_color",
                     "vivo_volume_whole_theme_icon_color_light": "volume_icon_color",
+                    "vivo_volume_whole_theme_icon_color_dark": "volume_icon_color_dark",
                 },
             ),
             (
@@ -1786,6 +1809,24 @@ class ThemeProject:
                 if m:
                     colors[dict_key] = "#" + m.group(1).lower()
         return colors
+
+    def write_volume_glyphs(self) -> None:
+        """Generate the volume icons in both modules using the project's tint colors."""
+        colors = self.get_systemui_colors()
+        glyphs = {}
+        for suffix, key in (("", "volume_icon_color"), ("_dark", "volume_icon_color_dark")):
+            rgba = (*_hex_to_rgb(colors[key]), 255)
+            for resource, kind in (
+                ("vol", "media"),
+                ("vol_mute", "media_mute"),
+                ("ring_notif", "ring"),
+                ("noti", "noti"),
+                ("clock", "clock"),
+            ):
+                glyphs[f"vivo_volume_ic_audio_{resource}_new{suffix}.png"] = make_volume_glyph_icon(kind, rgba)
+
+        for module in ("com.vivo.systemuiplugin", "com.android.systemui"):
+            self.modules.setdefault(module, {}).update(glyphs)
 
     def get_settings_strings(self) -> list[dict[str, str]]:
         """Read overridden string resources from com.android.settings/theme_values.xml."""
@@ -1853,11 +1894,14 @@ class ThemeProject:
         vol_prog = norm_hex(colors.get("volume_progress_color", colors.get("qs_main_color", cur["volume_progress_color"])))
         vol_bg_light = norm_hex(colors.get("volume_bg_color", cur["volume_bg_color"]), alpha="eb")
         vol_ic_light = norm_hex(colors.get("volume_icon_color", cur["volume_icon_color"]))
+        vol_ic_dark = norm_hex(colors.get("volume_icon_color_dark", cur["volume_icon_color_dark"]))
 
         plugin_mod = self.modules.setdefault("com.vivo.systemuiplugin", {})
         plugin_mod["theme_values.xml"] = (
             '<?xml version="1.0" encoding="utf-8" standalone="no"?>\n'
             "<vivo_theme_values>\n"
+            '    <bool name="new_style">true</bool>\n'
+            '    <bool name="is_color_style">true</bool>\n'
             f'    <color name="vivo_qs_tile_whole_theme_main_color">{qs_hex}</color>\n'
             f'    <color name="vivo_qs_tile_whole_theme_main_color_local">{qs_hex}</color>\n'
             f'    <color name="vivo_qs_tile_whole_theme_icon_color_active">{qs_hex}</color>\n'
@@ -1876,7 +1920,7 @@ class ThemeProject:
             f'    <color name="vivo_volume_whole_theme_background_color_light">{vol_bg_light}</color>\n'
             '    <color name="vivo_volume_whole_theme_background_color_dark">#e6243238</color>\n'
             f'    <color name="vivo_volume_whole_theme_icon_color_light">{vol_ic_light}</color>\n'
-            '    <color name="vivo_volume_whole_theme_icon_color_dark">#ffe4f7fa</color>\n'
+            f'    <color name="vivo_volume_whole_theme_icon_color_dark">{vol_ic_dark}</color>\n'
             '    <color name="vivo_volume_whole_theme_sheet_bg_color_light">#f2eef8fa</color>\n'
             '    <color name="vivo_volume_whole_theme_sheet_bg_color_dark">#f21b262c</color>\n'
             '    <color name="vivo_volume_whole_theme_sheet_font_color_light">#cc163840</color>\n'
@@ -1889,11 +1933,16 @@ class ThemeProject:
             f'    <color name="vivo_volume_whole_theme_tip_icon_color_dark">{vol_prog}</color>\n'
             f'    <color name="vivo_volume_seekbar_color_for_blur_new">{vol_prog}</color>\n'
             f'    <color name="vivo_volume_seekbar_color_for_no_blur_new">{vol_prog}</color>\n'
+            f'    <color name="vivo_volume_seekbar_color_for_gray">{vol_prog}</color>\n'
+            f'    <color name="vigour_color_track_gradient_startcolor">{vol_prog}</color>\n'
+            f'    <color name="vigour_color_track_gradient_startcolor_for_gray">{vol_prog}</color>\n'
             f'    <color name="vivo_volume_seekbar_bg_color_for_brief_dialog_row_no_blur_new">{vol_bg_light}</color>\n'
+            f'    <color name="vivo_volume_seekbar_bg_color_for_expand_dialog_row_blur_new">{vol_bg_light}</color>\n'
+            f'    <color name="vivo_volume_seekbar_bg_color_for_expand_dialog_row_no_blur_new">{vol_bg_light}</color>\n'
             '    <color name="vivo_volume_dialog_color_normal_new">#f2eef8fa</color>\n'
             '    <color name="vivo_volume_dialog_color_night_mode_new">#f21b262c</color>\n'
             f'    <color name="vivo_volume_icon_color_for_light_mode_new">{vol_ic_light}</color>\n'
-            '    <color name="vivo_volume_icon_color_for_night_mode_new">#ffe4f7fa</color>\n'
+            f'    <color name="vivo_volume_icon_color_for_night_mode_new">{vol_ic_dark}</color>\n'
             f'    <color name="vivo_volume_icon_color_for_theme">{vol_ic_light}</color>\n'
             f'    <color name="vivo_footer_volume_background_color">{vol_bg_light}</color>\n'
             f'    <color name="vivo_footer_volume_progress_color">{vol_prog}</color>\n'

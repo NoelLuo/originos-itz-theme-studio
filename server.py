@@ -40,7 +40,6 @@ from itz_engine import (
     make_qs_glyph_icon,
     make_switch_thumb_9patch,
     make_switch_track_png,
-    make_volume_glyph_icon,
     process_icon_image,
     wrap_nine_patch,
     write_supercard_assets,
@@ -251,6 +250,8 @@ class StudioHandler(BaseHTTPRequestHandler):
                 self.send_error(HTTPStatus.NOT_FOUND, "Asset not found")
                 return
             ctype, _ = mimetypes.guess_type(name)
+            if len(data) >= 12 and data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+                ctype = "image/webp"
             self._send_bytes(data, ctype or "application/octet-stream")
             return
 
@@ -595,16 +596,7 @@ class StudioHandler(BaseHTTPRequestHandler):
                     wifi_ic = make_qs_glyph_icon("wifi", (255, 255, 255, 255), size=144)
                     data_ic = make_qs_glyph_icon("data", (255, 255, 255, 255), size=144)
                     bt_ic = make_qs_glyph_icon("bt", (255, 255, 255, 255), size=144)
-                    vol_l = make_volume_glyph_icon("media", (38, 108, 124, 255), size=84)
-                    vol_d = make_volume_glyph_icon("media", (228, 247, 250, 255), size=84)
-                    vol_ml = make_volume_glyph_icon("media_mute", (38, 108, 124, 255), size=84)
-                    vol_md = make_volume_glyph_icon("media_mute", (228, 247, 250, 255), size=84)
-                    vol_rl = make_volume_glyph_icon("ring", (38, 108, 124, 255), size=84)
-                    vol_rd = make_volume_glyph_icon("ring", (228, 247, 250, 255), size=84)
-                    vol_nl = make_volume_glyph_icon("noti", (38, 108, 124, 255), size=84)
-                    vol_nd = make_volume_glyph_icon("noti", (228, 247, 250, 255), size=84)
-                    vol_cl = make_volume_glyph_icon("clock", (38, 108, 124, 255), size=84)
-                    vol_cd = make_volume_glyph_icon("clock", (228, 247, 250, 255), size=84)
+                    PROJECT.write_volume_glyphs()
                     for mod_name in ("com.vivo.systemuiplugin", "com.android.systemui"):
                         mod = PROJECT.modules.setdefault(mod_name, {})
                         for fn in (
@@ -626,16 +618,6 @@ class StudioHandler(BaseHTTPRequestHandler):
                             "vivo_super_qs_bluetooth_run_on.png", "vivo_super_qs_bluetooth_run_off.png",
                         ):
                             mod[fn] = bt_ic
-                        mod["vivo_volume_ic_audio_vol_new.png"] = vol_l
-                        mod["vivo_volume_ic_audio_vol_new_dark.png"] = vol_d
-                        mod["vivo_volume_ic_audio_vol_mute_new.png"] = vol_ml
-                        mod["vivo_volume_ic_audio_vol_mute_new_dark.png"] = vol_md
-                        mod["vivo_volume_ic_audio_ring_notif_new.png"] = vol_rl
-                        mod["vivo_volume_ic_audio_ring_notif_new_dark.png"] = vol_rd
-                        mod["vivo_volume_ic_audio_noti_new.png"] = vol_nl
-                        mod["vivo_volume_ic_audio_noti_new_dark.png"] = vol_nd
-                        mod["vivo_volume_ic_audio_clock_new.png"] = vol_cl
-                        mod["vivo_volume_ic_audio_clock_new_dark.png"] = vol_cd
                     self._send_json({"ok": True, "msg": "已生成透明底防纯色球控制中心字形 (Wi-Fi/数据/蓝牙 + 音量图标)"})
                     return
 

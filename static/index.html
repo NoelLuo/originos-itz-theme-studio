@@ -832,8 +832,8 @@
 
             <div class="asset-card">
               <div class="title">
-                <span>音量条与面板美化 (OriginOS 7 SystemUIPlugin)</span>
-                <button class="primary" onclick="quickPickModule('volume_bg')">换面板底图</button>
+                <span>音量条配色 (OriginOS 7 SystemUIPlugin)</span>
+                <button class="primary" onclick="quickPickModule('volume_bg')">旧版底图</button>
               </div>
               <img class="asset-thumb" id="thumbQuickVolume" />
               <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:12px;">
@@ -842,7 +842,7 @@
                 <label style="display:flex;align-items:center;gap:4px;"><input type="color" id="volIconColor" value="#266c7c" /> 图标色</label>
                 <button class="primary" onclick="quickVolumeColors()">保存音量配色</button>
               </div>
-              <div style="font-size:11px; color:var(--muted);">写入 <code>com.vivo.systemuiplugin/theme_values.xml</code> 全部 <code>vivo_volume_whole_theme_*</code> 色值与音量面板图。</div>
+              <div style="font-size:11px; color:var(--muted);">OriginOS 7 侧边音量面板为系统实时毛玻璃，由 <code>theme_values.xml</code>（<code>new_style</code> + 进度条/轨道/图标色）生效；上方 <code>vivo_footer_volume_bg.png</code> 仅兼容旧版底部音量条。</div>
             </div>
 
             <div class="asset-card">
@@ -1421,7 +1421,7 @@
         if (document.getElementById('volProgColor')) {
           document.getElementById('volProgColor').value = summary.systemui_colors.volume_progress_color || '#98d7e1';
           document.getElementById('volBgColor').value = summary.systemui_colors.volume_bg_color || '#e4f4f7';
-          document.getElementById('volIconColor').value = summary.systemui_colors.volume_icon_color || '#266c7c';
+          document.getElementById('volIconColor').value = summary.systemui_colors.volume_icon_color || '#54253e';
         }
       }
 
