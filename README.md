@@ -96,3 +96,7 @@ python .agents/skills/originos-itz-theme/scripts/verify_itz.py path/to/replaceme
 ## 免责声明
 
 本项目仅用于个人学习、OriginOS 主题资源结构研究与个人设备内的合法美化，仓库内**不包含任何官方受保护文件、第三方修改工具 APK 或受版权保护的美术/字体素材**。请勿将包含未授权版权素材的主题包用于公开传播或商业盈利。
+
+<p align="center">
+  <img src="docs/afdian.jpg" width="280" alt="" />
+</p>
