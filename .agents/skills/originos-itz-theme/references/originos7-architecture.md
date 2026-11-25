@@ -74,7 +74,7 @@ An `.itz` file is a standard ZIP archive containing:
 - In `SystemUIPlugin.apk` `VivoQSIconViewImpl.updateIcon()`:
   - Tiles with `useTint() == true` (Wi-Fi, Mobile Data, Bluetooth) unconditionally execute `drawable.setTint(iconTintColor)` (`SRC_IN` solid white when ON) on static `BitmapDrawable` PNGs.
   - Only `Animatable2` (such as `AnimatedImageDrawable`) or `FontSymbolIcon` avoids getting flattened into a monochrome white silhouette.
-- **Full-color bypass technique**: Encode the `144×144` icon as a looping **animated WebP** (`RIFF....WEBP` containing `ANIM` chunk, e.g., 2 identical or subtle-animation frames) and store it inside `com.vivo.systemuiplugin` under the expected `.png` resource name (e.g., `vivo_super_qs_wifi_on.png`). Android's decoder sniffs the magic bytes and decodes an `AnimatedImageDrawable`, preserving full color even after `setTint(WHITE)`.
+- **Full-color test package**: Encode the `144×144` icon as a looping **animated WebP** (`RIFF....WEBP` containing `ANIM` chunk, e.g., 2 identical or subtle-animation frames) and store it inside `com.vivo.systemuiplugin` under the expected `.png` resource name (e.g., `vivo_super_qs_wifi_on.png`). The device probe decoded the WebP as `AnimatedImageDrawable` and kept its colors after `setTint(WHITE)`. Apply the test `.itz` and toggle the actual tiles to check the Control Center rendering.
 - **Fallback monochrome technique**: If using static PNGs, draw pure `#FFFFFF` solid shapes (35%–50% opaque area) with **6–8px transparent negative-space cutouts** so facial details remain crisp at ~30dp.
 
 ---

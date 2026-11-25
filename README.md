@@ -57,14 +57,21 @@ Windows 用户也可直接双击 `start.bat`。启动后会自动在浏览器打
 
 ---
 
-## 内置 Agent Skill（AI 协作技能包）
+## 项目技能
 
-仓库自带开箱即用的跨端 Agent Skill：[`originos-itz-theme`](.agents/skills/originos-itz-theme/SKILL.md)（遵循 `.agents/skills/<name>/SKILL.md` 规范，克隆本仓库后可被 Antigravity / Codex 等 AI 编程代理自动发现）：
+技能位于 `.agents/skills/`，按主题制作阶段选用。
 
-- [`.agents/skills/originos-itz-theme/SKILL.md`](.agents/skills/originos-itz-theme/SKILL.md)：OriginOS 7 `.itz` 主题开发、排障、自动打包与推送完整工作流与铁律清单
-- [`.agents/skills/originos-itz-theme/references/originos7-architecture.md`](.agents/skills/originos-itz-theme/references/originos7-architecture.md)：实机逆向验证的 OriginOS 7 底层机制（`0 npTc` 点九图、超级卡包 141 枚 AAPT2 混淆名、音量 `new_style` 开关、控制中心动图 WebP 全彩绕过 `setTint`、`VMoveBoolButton` 头像开关、卸载弹窗等）
-- [`.agents/skills/originos-itz-theme/references/asset-specs.md`](.agents/skills/originos-itz-theme/references/asset-specs.md)：全模块像素尺寸、安全边距与美术出图规范
-- [`.agents/skills/originos-itz-theme/scripts/verify_itz.py`](.agents/skills/originos-itz-theme/scripts/verify_itz.py)：零第三方依赖的主题包 & 替换包一键体检脚本
+| 使用场景 | Codex 技能 |
+| --- | --- |
+| 源主题、直用替换包、SuperCard 映射与真机验收 | [主题工程与打包](.agents/skills/originos-itz-theme/SKILL.md) |
+| 桌面应用图标、包名映射、整套预览 | [桌面应用图标](.agents/skills/originos-launcher-icons/SKILL.md) |
+| 短信卡片、按压态与卸载底部弹窗 | [点九图卡片与弹窗](.agents/skills/originos-theme-nine-patch/SKILL.md) |
+| 设置页和超级卡包的角色头像开关 | [设置头像开关](.agents/skills/originos-settings-switches/SKILL.md) |
+| Wi-Fi、移动数据、蓝牙和音量面板图标 | [控制中心与音量面板](.agents/skills/originos-system-ui-icons/SKILL.md) |
+
+本地历史导出包可放在 `历史主题包/`。当前使用的打包输入按脚本配置放置。
+
+主题工程技能附有[资源尺寸规范](.agents/skills/originos-itz-theme/references/asset-specs.md)、[OriginOS 7 机制记录](.agents/skills/originos-itz-theme/references/originos7-architecture.md)和[包校验脚本](.agents/skills/originos-itz-theme/scripts/verify_itz.py)。
 
 ```bash
 python .agents/skills/originos-itz-theme/scripts/verify_itz.py path/to/theme.itz
@@ -78,8 +85,7 @@ python .agents/skills/originos-itz-theme/scripts/verify_itz.py path/to/replaceme
 ```text
 .
 ├── .agents/
-│   └── skills/
-│       └── originos-itz-theme/  # 内置 OriginOS 7 主题开发 Agent Skill 与自动校验脚本
+│   └── skills/                  # 主题工程及组件专项技能
 ├── server.py                    # 本地 Web GUI 服务端（零第三方 Web 框架依赖）
 ├── itz_engine.py                # .itz 解析、打包、OriginOS 7 资源生成与替换包合并核心
 ├── apk_icon_extractor.py        # ADB 批量提取手机原版应用图标（无需完整拉取 APK）
