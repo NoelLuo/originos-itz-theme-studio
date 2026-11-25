@@ -1,0 +1,664 @@
+{
+  "bg_memory_card_holder_cn": {
+    "bN.webp": [
+      576,
+      932
+    ]
+  },
+  "bg_memory_card_holder_en": {
+    "Jh.webp": [
+      576,
+      932
+    ]
+  },
+  "bg_staging_card_holder": {
+    "jK.webp": [
+      864,
+      1398
+    ]
+  },
+  "bg_camera_card01": {
+    "2W.webp": [
+      576,
+      932
+    ],
+    "lm.webp": [
+      864,
+      1398
+    ],
+    "eM.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_camera_card02": {
+    "Uf.webp": [
+      576,
+      932
+    ],
+    "Rl.webp": [
+      864,
+      1398
+    ],
+    "rH.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_camera_card03": {
+    "7R.webp": [
+      576,
+      932
+    ],
+    "sQ1.webp": [
+      864,
+      1398
+    ],
+    "HE.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_camera_card04": {
+    "yX.webp": [
+      576,
+      932
+    ],
+    "73.webp": [
+      864,
+      1398
+    ],
+    "bR.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_camera_card04_iqoo": {
+    "LT.webp": [
+      576,
+      932
+    ],
+    "qr.webp": [
+      864,
+      1398
+    ],
+    "yw1.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_camera_card05": {
+    "WN.webp": [
+      576,
+      932
+    ],
+    "8a.webp": [
+      864,
+      1398
+    ],
+    "4-.webp": [
+      864,
+      1398
+    ]
+  },
+  "bg_camera_card06_iqoo": {
+    "1X.webp": [
+      576,
+      932
+    ],
+    "ym.webp": [
+      864,
+      1398
+    ],
+    "81.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_camera_card07": {
+    "3-.webp": [
+      576,
+      932
+    ],
+    "ts.webp": [
+      864,
+      1398
+    ],
+    "yI.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_camera_small_01": {
+    "9e.webp": [
+      108,
+      164
+    ],
+    "B5.webp": [
+      162,
+      246
+    ],
+    "8U.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_camera_small_02": {
+    "4y.webp": [
+      108,
+      164
+    ],
+    "h3.webp": [
+      162,
+      246
+    ],
+    "pa.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_camera_small_03": {
+    "kA.webp": [
+      108,
+      164
+    ],
+    "tH.webp": [
+      162,
+      246
+    ],
+    "-a.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_camera_small_04": {
+    "8B.webp": [
+      108,
+      164
+    ],
+    "hl1.webp": [
+      162,
+      246
+    ],
+    "sM.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_camera_small_04_iqoo": {
+    "5k.webp": [
+      108,
+      164
+    ],
+    "ZY1.webp": [
+      162,
+      246
+    ],
+    "Z7.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_camera_small_05": {
+    "qg1.webp": [
+      108,
+      164
+    ],
+    "bv.webp": [
+      162,
+      246
+    ],
+    "T9.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_camera_small_06_iqoo": {
+    "xn.webp": [
+      108,
+      164
+    ],
+    "F4.webp": [
+      162,
+      246
+    ],
+    "AJ.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_camera_small_07": {
+    "EN.webp": [
+      108,
+      164
+    ],
+    "IK.webp": [
+      162,
+      246
+    ],
+    "x5.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard00": {
+    "0e.webp": [
+      576,
+      932
+    ],
+    "-9.webp": [
+      864,
+      1398
+    ],
+    "Kh.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard01": {
+    "u_.webp": [
+      576,
+      932
+    ],
+    "Z1.webp": [
+      864,
+      1398
+    ],
+    "qs1.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard01_iqoo": {
+    "v3.webp": [
+      576,
+      932
+    ],
+    "G4.webp": [
+      864,
+      1398
+    ],
+    "x8.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard02": {
+    "pT.webp": [
+      576,
+      932
+    ],
+    "eh.webp": [
+      864,
+      1398
+    ],
+    "Rk.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard03": {
+    "PL.webp": [
+      576,
+      932
+    ],
+    "LV.webp": [
+      864,
+      1398
+    ],
+    "9m.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard04": {
+    "tG.webp": [
+      576,
+      932
+    ],
+    "KQ.webp": [
+      864,
+      1398
+    ],
+    "ZJ.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard05": {
+    "El.webp": [
+      576,
+      932
+    ],
+    "xB.webp": [
+      864,
+      1398
+    ],
+    "iB.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard06_iqoo": {
+    "TI.webp": [
+      576,
+      932
+    ],
+    "1M.webp": [
+      864,
+      1398
+    ],
+    "qO.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard07": {
+    "_D.webp": [
+      576,
+      932
+    ],
+    "94.webp": [
+      864,
+      1398
+    ],
+    "w1.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard10": {
+    "yJ1.webp": [
+      576,
+      932
+    ],
+    "Qf.webp": [
+      864,
+      1398
+    ],
+    "89.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard11": {
+    "80.webp": [
+      576,
+      932
+    ],
+    "-X.webp": [
+      864,
+      1398
+    ],
+    "U41.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard12": {
+    "g_.webp": [
+      576,
+      932
+    ],
+    "d8.webp": [
+      864,
+      1398
+    ],
+    "Mf.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard13": {
+    "RE.webp": [
+      576,
+      932
+    ],
+    "BJ.webp": [
+      864,
+      1398
+    ],
+    "cz.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard14": {
+    "CA.webp": [
+      576,
+      932
+    ],
+    "t7.webp": [
+      864,
+      1398
+    ],
+    "wq.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard15": {
+    "lO.webp": [
+      576,
+      932
+    ],
+    "zU.webp": [
+      864,
+      1398
+    ],
+    "pU.webp": [
+      1152,
+      1864
+    ]
+  },
+  "bg_paycard_small_00": {
+    "3V.webp": [
+      108,
+      164
+    ],
+    "u2.webp": [
+      162,
+      246
+    ],
+    "Wh.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_01": {
+    "Y4.webp": [
+      108,
+      164
+    ],
+    "Ni.webp": [
+      162,
+      246
+    ],
+    "5T.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_01_iqoo": {
+    "MT.webp": [
+      108,
+      164
+    ],
+    "LZ.webp": [
+      162,
+      246
+    ],
+    "eq.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_02": {
+    "sX.webp": [
+      108,
+      164
+    ],
+    "6m.webp": [
+      162,
+      246
+    ],
+    "Ns.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_03": {
+    "w3.webp": [
+      108,
+      164
+    ],
+    "yY.webp": [
+      162,
+      246
+    ],
+    "AV.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_04": {
+    "E0.webp": [
+      108,
+      164
+    ],
+    "Rh.webp": [
+      162,
+      246
+    ],
+    "uR.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_05": {
+    "qv.webp": [
+      108,
+      164
+    ],
+    "0V.webp": [
+      162,
+      246
+    ],
+    "xY.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_06_iqoo": {
+    "pj.webp": [
+      108,
+      164
+    ],
+    "2G.webp": [
+      162,
+      246
+    ],
+    "6j1.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_07": {
+    "gy.webp": [
+      108,
+      164
+    ],
+    "2A.webp": [
+      162,
+      246
+    ],
+    "ZR.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_10": {
+    "uC.webp": [
+      108,
+      164
+    ],
+    "Mq.webp": [
+      162,
+      246
+    ],
+    "0T.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_11": {
+    "_K.webp": [
+      108,
+      164
+    ],
+    "ey.webp": [
+      162,
+      246
+    ],
+    "A5.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_12": {
+    "Ib.webp": [
+      108,
+      164
+    ],
+    "nT.webp": [
+      162,
+      246
+    ],
+    "yJ.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_13": {
+    "Ex.webp": [
+      108,
+      164
+    ],
+    "xa.webp": [
+      162,
+      246
+    ],
+    "fG.webp": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_14": {
+    "K7.png": [
+      108,
+      164
+    ],
+    "nZ.png": [
+      162,
+      246
+    ],
+    "Nu.png": [
+      216,
+      328
+    ]
+  },
+  "bg_paycard_small_15": {
+    "QT.png": [
+      108,
+      164
+    ],
+    "rp.png": [
+      162,
+      246
+    ],
+    "uW.png": [
+      216,
+      328
+    ]
+  }
+}

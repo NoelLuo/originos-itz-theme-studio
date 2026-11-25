@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OriginOS .itz Theme Studio</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --border: #e5e8ef;
+      --text: #1e2430;
+      --muted: #687385;
+      --accent: #3b6ff5;
+      --accent-hover: #2c5ce0;
+      --accent-soft: #eef3ff;
+      --success: #16a34a;
+      --warn: #d97706;
+      --radius: 14px;
+      --surface-sub: #fafbfd;
+      --checker-a: #edf0f5;
+      --checker-b: #ffffff;
+    }
+    body.dark {
+      --bg: #0f1218;
+      --card: #171c26;
+      --border: #262e3d;
+      --text: #e6ebf4;
+      --muted: #93a0b5;
+      --accent: #5b8cff;
+      --accent-hover: #4778f0;
+      --accent-soft: #1f2b47;
+      --surface-sub: #1c222e;
+      --checker-a: #232a38;
+      --checker-b: #1b212c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      height: 60px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button, .btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 7px 13px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    button:hover { background: var(--surface-sub); border-color: var(--muted); }
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    button.primary:hover { background: var(--accent-hover); }
+    button.success {
+      background: var(--success);
+      color: #fff;
+      border-color: var(--success);
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 370px;
+      gap: 16px;
+      padding: 16px 20px;
+      overflow: hidden;
+    }
+    .editor-pane {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-sub);
+    }
+    .tab {
+      padding: 9px 16px;
+      border-radius: 10px 10px 0 0;
+      border: 1px solid transparent;
+      border-bottom: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: var(--card);
+      color: var(--accent);
+      border-color: var(--border);
+      margin-bottom: -1px;
+      padding-bottom: 10px;
+    }
+    .tab-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .field label { font-size: 12px; font-weight: 600; color: var(--muted); }
+    input[type="text"], textarea, select {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--card);
+      color: var(--text);
+      outline: none;
+    }
+    input[type="text"]:focus, textarea:focus { border-color: var(--accent); }
+
+    .asset-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: var(--surface-sub);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .asset-card .title {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .asset-thumb {
+      width: 100%;
+      height: 180px;
+      border-radius: 8px;
+      background: repeating-conic-gradient(var(--checker-a) 0% 25%, var(--checker-b) 0% 50%) 50% / 16px 16px;
+      object-fit: contain;
+      border: 1px solid var(--border);
+    }
+    .icon-toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+      gap: 10px;
+    }
+    .icon-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 8px;
+      text-align: center;
+      background: var(--surface-sub);
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.12s;
+      position: relative;
+    }
+    .icon-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .icon-item img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: repeating-conic-gradient(var(--checker-a) 0% 25%, var(--checker-b) 0% 50%) 50% / 10px 10px;
+    }
+    .icon-placeholder {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto;
+      border-radius: 12px;
+      border: 1.5px dashed var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--card);
+      opacity: 0.72;
+    }
+    .icon-state {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .icon-state.custom { background: rgba(22, 163, 74, 0.14); color: var(--success); }
+    .icon-state.default { background: rgba(104, 115, 133, 0.14); color: var(--muted); }
+    .icon-item .app-label {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .icon-item .pkg {
+      margin-top: 2px;
+      font-size: 10px;
+      color: var(--muted);
+      word-break: break-all;
+      line-height: 1.25;
+      max-height: 25px;
+      overflow: hidden;
+    }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    /* Right Phone Preview */
+    .preview-pane {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+    .preview-controls {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .preview-controls button.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .phone-frame {
+      width: 290px;
+      height: 615px;
+      border-radius: 34px;
+      border: 8px solid #1b1f27;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.18);
+      flex-shrink: 0;
+    }
+    .phone-statusbar {
+      height: 28px;
+      padding: 6px 16px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      position: relative;
+      z-index: 5;
+    }
+    .phone-screen {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+    }
+    .lockscreen-clock {
+      margin-top: 54px;
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+    }
+    .lockscreen-clock .time { font-size: 56px; font-weight: 300; letter-spacing: -1px; line-height: 1; }
+    .lockscreen-clock .date { font-size: 13px; margin-top: 6px; opacity: 0.92; }
+
+    .desktop-grid {
+      margin-top: 32px;
+      padding: 0 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px 12px;
+    }
+    .desktop-app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .desktop-app img {
+      width: 46px;
+      height: 46px;
+      border-radius: 11px;
+      object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    .desktop-app span {
+      font-size: 10px;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.75);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 58px;
+    }
+
+    .settings-screen {
+      flex: 1;
+      padding: 12px 12px 16px;
+      overflow-y: auto;
+      background-size: cover;
+      background-position: center;
+    }
+    .settings-screen.light { background-color: #f4f6f9; color: #1a1d24; }
+    .settings-screen.dark { background-color: #101216; color: #f1f5f9; }
+    .settings-header { font-size: 20px; font-weight: 700; margin: 4px 4px 10px; }
+    .settings-search {
+      border-radius: 16px;
+      padding: 7px 12px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      opacity: 0.78;
+    }
+    .settings-screen.light .settings-search { background: rgba(255,255,255,0.85); }
+    .settings-screen.dark .settings-search { background: rgba(38,42,50,0.85); }
+    .settings-group {
+      border-radius: 14px;
+      padding: 4px 10px;
+      margin-bottom: 10px;
+      backdrop-filter: blur(8px);
+    }
+    .settings-screen.light .settings-group { background: rgba(255,255,255,0.72); }
+    .settings-screen.dark .settings-group { background: rgba(30,33,40,0.72); }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 2px;
+      font-size: 12px;
+      border-bottom: 1px solid rgba(128,128,128,0.12);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row img { width: 20px; height: 20px; object-fit: contain; }
+
+    .adb-box {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: var(--surface-sub);
+      margin-bottom: 14px;
+    }
+    .missing-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .missing-chip {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      cursor: pointer;
+    }
+    .missing-chip:hover { background: #ffedd5; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e2430;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      z-index: 999;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .drop-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(59, 111, 245, 0.12);
+      border: 3px dashed var(--accent);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      backdrop-filter: blur(2px);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span>OriginOS .itz Theme Studio</span>
+      <span class="badge" id="loadedBadge">未加载主题</span>
+    </div>
+    <div class="toolbar">
+      <input type="file" id="itzFileInput" accept=".itz,.zip" style="display:none" />
+      <button onclick="createNewItz()">新建 .itz</button>
+      <button onclick="document.getElementById('itzFileInput').click()">打开 .itz</button>
+      <button onclick="mapVivoIcons()" title="将 MIUI/通用包名图标自动映射到 OriginOS 真实包名">映射 vivo 图标</button>
+      <button onclick="patchOrigin6Settings()" title="补齐系统管理与升级、散热风扇等 OriginOS 6/7 设置图标">补齐 OS 6/7 设置</button>
+      <button id="themeToggleBtn" onclick="toggleUiDarkMode()">🌙 夜间模式</button>
+      <button class="primary" onclick="exportItz()">导出 .itz</button>
+      <button class="primary" onclick="exportReplacementPack()" title="自动执行 MT 管理器 7 步打包，直接输出免手操的 主题替换包.itz">📦 导出替换包</button>
+      <button class="success" id="adbPushBtn" onclick="pushReplacementPackToPhone()" title="自动打包并直推到手机 /sdcard/_共享/OriginOS7主题/主题替换包.itz">📲 直推替换包到手机</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <div class="editor-pane">
+      <div class="tabs">
+        <button class="tab active" data-tab="info">基本信息与预览</button>
+        <button class="tab" data-tab="wallpapers">壁纸与设置背景</button>
+        <button class="tab" data-tab="icons">桌面图标 (<span id="iconCountLabel">0</span>)</button>
+        <button class="tab" data-tab="launcher">未绘制统一样式 (<span id="launcherCountLabel">0</span>)</button>
+        <button class="tab" data-tab="settings">设置页图标 (<span id="settingsCountLabel">0</span>)</button>
+        <button class="tab" data-tab="systemui">控制中心与状态栏 (<span id="systemuiCountLabel">0</span>)</button>
+        <button class="tab" data-tab="quick">系统美化 (弹窗/短信/卡包/时钟)</button>
+        <button class="tab" data-tab="extras">字体 / 铃声 / 锁屏包</button>
+        <button class="tab" data-tab="modules">全局模块工坊</button>
+      </div>
+
+      <div class="tab-body">
+        <!-- Tab 1: Info & Previews -->
+        <div class="panel active" id="panel-info">
+          <div class="grid-2">
+            <div class="field"><label>主题名称 (title)</label><input type="text" id="metaTitle" /></div>
+            <div class="field"><label>作者 (author)</label><input type="text" id="metaAuthor" /></div>
+            <div class="field"><label>设计师 (designer)</label><input type="text" id="metaDesigner" /></div>
+            <div class="field"><label>版本号 (version)</label><input type="text" id="metaVersion" /></div>
+            <div class="field"><label>适配系统版本 (sysromver)</label><input type="text" id="metaRomVer" placeholder="17.0" /></div>
+            <div class="field"><label>主题 ID</label><input type="text" id="metaId" /></div>
+          </div>
+          <div class="field">
+            <label>主题简介 (description)</label>
+            <textarea id="metaDesc" rows="3"></textarea>
+          </div>
+          <button class="primary" onclick="saveMetadata()">保存基本信息</button>
+
+          <h4 style="margin:20px 0 10px">商店/本地预览图 (preview/)</h4>
+          <div class="grid-3" id="previewGrid"></div>
+        </div>
+
+        <!-- Tab 2: Wallpapers & Settings Backgrounds -->
+        <div class="panel" id="panel-wallpapers">
+          <div class="grid-2">
+            <div class="asset-card">
+              <div class="title">
+                <span>桌面壁纸 (default_wallpaper.jpg)</span>
+                <button onclick="pickAsset('root', 'wallpaper/default_wallpaper.jpg', 'image/*')">替换</button>
+              </div>
+              <img class="asset-thumb" id="thumbWallpaper" />
+            </div>
+            <div class="asset-card">
+              <div class="title">
+                <span>锁屏壁纸 (default_lock_wallpaper.jpg)</span>
+                <button onclick="pickAsset('root', 'wallpaper/default_lock_wallpaper.jpg', 'image/*')">替换</button>
+              </div>
+              <img class="asset-thumb" id="thumbLockscreen" />
+            </div>
+            <div class="asset-card">
+              <div class="title">
+                <span>设置页浅色立绘背景 (vivo模块)</span>
+                <button onclick="pickAsset('vivo', 'vigour_window_settting_background_light.png', 'image/*')">替换</button>
+              </div>
+              <img class="asset-thumb" id="thumbVivoLight" />
+            </div>
+            <div class="asset-card">
+              <div class="title">
+                <span>设置页深色立绘背景 (vivo模块)</span>
+                <button onclick="pickAsset('vivo', 'vigour_window_settting_background_dark.png', 'image/*')">手动替换</button>
+              </div>
+              <img class="asset-thumb" id="thumbVivoDark" />
+              <div style="display:flex; gap:10px; align-items:center; font-size:12px;">
+                <label>亮度 <input type="range" id="darkBright" min="0.1" max="0.6" step="0.02" value="0.26" /></label>
+                <label>对比 <input type="range" id="darkContrast" min="0.8" max="1.5" step="0.04" value="1.12" /></label>
+                <button onclick="generateDarkBg()">一键压暗生成</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Desktop Icons -->
+        <div class="panel" id="panel-icons">
+          <div class="adb-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span style="font-size:13px; font-weight:600;" id="adbStatusText">ADB 状态检测中...</span>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button onclick="refreshAdbStatus()">刷新连接</button>
+                <button onclick="scanMissingApps()">扫描手机未绘制图标</button>
+                <button onclick="exportPhoneRawIcons()">⬇ 批量提取手机原始图标 (ZIP)</button>
+              </div>
+            </div>
+            <div class="missing-list" id="missingList"></div>
+          </div>
+
+          <div class="icon-toolbar">
+            <input type="text" id="iconSearch" placeholder="搜索程序名或包名，如 微信 / com.tencent.mm ..." style="flex:1; min-width:180px;" oninput="loadIcons(1)" />
+            <select id="iconFilter" onchange="loadIcons(1)">
+              <option value="all">全部（含默认模板）</option>
+              <option value="custom">仅已绘制</option>
+              <option value="default">仅未绘制（默认）</option>
+            </select>
+            <label style="font-size:12px; display:flex; align-items:center; gap:4px;">
+              <input type="checkbox" id="autoProcessIcon" checked /> 上传时自动裁切圆角 (192×192)
+            </label>
+            <button onclick="addNewIcon()">+ 新增包名图标</button>
+            <button onclick="downloadChecklist('icons')">⬇ 下载应用清单 (CSV)</button>
+          </div>
+          <div class="icon-grid" id="iconGrid"></div>
+          <div class="pagination" id="iconPagination"></div>
+        </div>
+
+        <!-- Tab 3.5: Launcher Uniform Style -->
+        <div class="panel" id="panel-launcher">
+          <div class="adb-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div style="position:relative; width:72px; height:72px; border-radius:16px; overflow:hidden; border:1px solid var(--border); background:#f1f5f9; flex-shrink:0;" title="底衬 + 原图 + 前景边框 叠图预览">
+                  <img id="launcherPreviewBg" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none'" />
+                  <div style="position:absolute; inset:14px; border-radius:10px; background:linear-gradient(135deg,#3b82f6,#6366f1); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:16px;">App</div>
+                  <img id="launcherPreviewCover" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none'" />
+                </div>
+                <div>
+                  <div style="font-size:13px; font-weight:600; margin-bottom:4px;">未单独绘制图标的统一样式 (launcher/)</div>
+                  <div style="font-size:12px; color:var(--muted);">系统会用 <code>icon_mask</code> 裁切原图标，垫上 <code>icon_bg_default</code>（或 1~7 轮换底衬），再盖上 <code>icon_cover</code> 前景边框。</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:12px;">
+                <label>原图宽 <input type="text" id="lcWidth" style="width:52px;" /></label>
+                <label>原图高 <input type="text" id="lcHeight" style="width:52px;" /></label>
+                <label>左偏移 <input type="text" id="lcLeft" style="width:48px;" /></label>
+                <label>上偏移 <input type="text" id="lcTop" style="width:48px;" /></label>
+                <button class="primary" onclick="saveLauncherConfig()">保存尺寸</button>
+              </div>
+            </div>
+            <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; gap:12px; align-items:center; flex-wrap:wrap; font-size:12px;">
+              <span style="font-weight:600;">一键套框生成器：</span>
+              <label style="display:flex; align-items:center; gap:6px;">
+                主题色 <input type="color" id="kitColor" value="#98D7E1" />
+              </label>
+              <label style="display:flex; align-items:center; gap:6px;">
+                角标装饰
+                <select id="kitOrnament">
+                  <option value="feather" selected>羽毛角标</option>
+                  <option value="sparkle">星芒角标</option>
+                  <option value="none">纯简约双线框</option>
+                </select>
+              </label>
+              <button class="primary" onclick="generateLauncherKit()">✨ 一键生成全套统一样式</button>
+            </div>
+          </div>
+          <div class="icon-grid" id="launcherIconGrid"></div>
+        </div>
+
+        <!-- Tab 4: Settings Icons -->
+        <div class="panel" id="panel-settings">
+          <div class="adb-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span style="font-size:13px; font-weight:600;">设置页可改文本 (com.android.settings/theme_values.xml)</span>
+              <button class="primary" onclick="saveSettingsStrings()">保存设置文本</button>
+            </div>
+            <div class="grid-2" id="settingsStringsGrid"></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; flex-wrap:wrap;">
+            <span style="font-size:13px; color:var(--muted);">点击任意图标即可替换为新 PNG（建议 84×84 透明背景）</span>
+            <div style="display:flex; gap:8px;">
+              <button onclick="downloadChecklist('settings')">⬇ 下载设置图标清单 (CSV)</button>
+              <button class="primary" onclick="patchOrigin6Settings()">一键补齐 OS 6/7 设置图标</button>
+            </div>
+          </div>
+          <div class="icon-grid" id="settingsIconGrid"></div>
+        </div>
+
+        <!-- Tab 5: Control Center & Status Bar -->
+        <div class="panel" id="panel-systemui">
+          <div class="adb-box">
+            <div style="font-size:13px; font-weight:600; margin-bottom:10px;">控制中心与状态栏配色 (com.vivo.systemuiplugin / com.android.systemui)</div>
+            <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center; font-size:12px;">
+              <label style="display:flex; align-items:center; gap:6px;">
+                <input type="color" id="colorQsMain" value="#c5ddaf" /> 磁贴开启主色
+              </label>
+              <label style="display:flex; align-items:center; gap:6px;">
+                <input type="color" id="colorSwitcherText" value="#c5ddaf" /> 开关文字色
+              </label>
+              <label style="display:flex; align-items:center; gap:6px;">
+                <input type="color" id="colorStatusbarText" value="#000000" /> 状态栏展开文字
+              </label>
+              <label style="display:flex; align-items:center; gap:6px;">
+                <input type="color" id="colorBatteryBlack" value="#ffffff" /> 电池文字(深底)
+              </label>
+              <label style="display:flex; align-items:center; gap:6px;">
+                <input type="color" id="colorBatteryWhite" value="#000000" /> 电池文字(浅底)
+              </label>
+              <button class="primary" onclick="saveSystemUiColors()">保存配色</button>
+            </div>
+          </div>
+
+          <div class="icon-toolbar">
+            <input type="text" id="systemuiSearch" placeholder="搜索开关名称或文件名，如 冥想 / 个人 / meditation ..." style="flex:1;" oninput="loadSystemUiIcons()" />
+            <button onclick="downloadChecklist('systemui')">⬇ 下载控制中心清单 (CSV)</button>
+          </div>
+          <div class="icon-grid" id="systemuiIconGrid"></div>
+        </div>
+
+        <!-- Tab 5.5: Dedicated Visual Customization Cards -->
+        <div class="panel" id="panel-quick">
+          <div class="grid-2">
+            <div class="asset-card">
+              <div class="title">
+                <span>底部弹窗背景 (卸载/系统确认弹窗)</span>
+                <div style="display:flex; gap:6px; align-items:center;">
+                  <input type="color" id="dialogThemeColor" value="#7AC8D8" />
+                  <button onclick="quickDialogColor()">磨砂纯色生成</button>
+                  <button class="primary" onclick="quickPickModule('dialog_bg')">选图替换</button>
+                </div>
+              </div>
+              <img class="asset-thumb" id="thumbQuickDialog" />
+              <div style="font-size:11px; color:var(--muted);">已验证 OriginOS 7 卸载底部弹窗真路径：<code>vivo/vigour_dialog_full_light.9.png</code>（及 <code>_os2/_dark/bottom</code>，0 npTc 防失效）。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>全系统设置/卡包头像开关按钮 (VMoveBoolButton)</span>
+                <div style="display:flex; gap:6px; align-items:center;">
+                  <input type="color" id="switchThemeColor" value="#6AC4D4" />
+                  <button class="primary" onclick="quickPickSwitchAvatar()">选头像生成开关</button>
+                </div>
+              </div>
+              <div style="display:flex; gap:18px; justify-content:center; align-items:center; height:140px; background:repeating-conic-gradient(var(--checker-a) 0% 25%, var(--checker-b) 0% 50%) 50% / 16px 16px; border-radius:8px; border:1px solid var(--border);">
+                <div style="text-align:center;">
+                  <img id="thumbSwitchOn" style="height:46px; object-fit:contain;" onerror="this.style.opacity=0.2" />
+                  <div style="font-size:11px;color:var(--muted);margin-top:4px;">开启态 (ON)</div>
+                </div>
+                <div style="text-align:center;">
+                  <img id="thumbSwitchOff" style="height:46px; object-fit:contain;" onerror="this.style.opacity=0.2" />
+                  <div style="font-size:11px;color:var(--muted);margin-top:4px;">关闭态 (OFF)</div>
+                </div>
+              </div>
+              <div style="font-size:11px; color:var(--muted);">对应 <code>vivo/vigour_bool_btn_bg_on/off_light.png</code> 与 <code>hand_normal_light.9.png</code>，自动置透默认竖线防遮脸。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>锁屏原生组件美化 (密码键盘 / 快捷圆底 / 充电)</span>
+                <div style="display:flex; gap:6px; align-items:center;">
+                  <input type="color" id="lockUiColor" value="#98D7E1" />
+                  <button onclick="quickLockscreenUi(false)">一键纯色</button>
+                  <button class="primary" onclick="quickLockscreenUi(true)">带头像生成</button>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center; padding:12px; background:var(--surface-sub); border-radius:8px; border:1px solid var(--border);">
+                <div>
+                  <img id="thumbPinKey" style="width:52px;height:52px;object-fit:contain;" onerror="this.style.opacity=0.2" />
+                  <div style="font-size:11px;color:var(--muted);">密码按键圆底</div>
+                </div>
+                <div>
+                  <img id="thumbPinDot" style="width:36px;height:52px;object-fit:contain;" onerror="this.style.opacity=0.2" />
+                  <div style="font-size:11px;color:var(--muted);">星芒密码点</div>
+                </div>
+                <div>
+                  <img id="thumbQuickLockBg" style="width:52px;height:52px;object-fit:contain;" onerror="this.style.opacity=0.2" />
+                  <div style="font-size:11px;color:var(--muted);">锁屏快捷圆底</div>
+                </div>
+              </div>
+              <div style="font-size:11px; color:var(--muted);">同步写入 <code>com.android.systemui</code> 密码按键/圆点/上滑符与 <code>com.vivo.systemuiplugin</code> 快捷圆底/充电图标。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>短信聊天气泡 (com.android.mms)</span>
+                <div style="display:flex; gap:6px; align-items:center;">
+                  <input type="color" id="mmsBubbleColor" value="#98D7E1" />
+                  <button onclick="quickMmsBubble()">纯色生成</button>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px; justify-content:center; padding:14px; height:150px; background:repeating-conic-gradient(var(--checker-a) 0% 25%, var(--checker-b) 0% 50%) 50% / 16px 16px; border-radius:8px; border:1px solid var(--border);">
+                <div onclick="quickPickModule('mms_left_img')" title="点击上传左侧(接收)气泡图" style="align-self:flex-start; max-width:80%; cursor:pointer; position:relative; padding:8px 14px; font-size:12px; color:#1e2430;">
+                  <img id="thumbQuickMmsLeft" style="position:absolute; inset:0; width:100%; height:100%; object-fit:fill; z-index:0;" onerror="this.style.opacity=0.2" />
+                  <span style="position:relative; z-index:1;">对方消息：验证码 5857</span>
+                </div>
+                <div onclick="quickPickModule('mms_right_img')" title="点击上传右侧(发送)气泡图" style="align-self:flex-end; max-width:80%; cursor:pointer; position:relative; padding:8px 14px; font-size:12px; color:#1e2430;">
+                  <img id="thumbQuickMmsRight" style="position:absolute; inset:0; width:100%; height:100%; object-fit:fill; z-index:0;" onerror="this.style.opacity=0.2" />
+                  <span style="position:relative; z-index:1;">我方消息：好的收到~</span>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; justify-content:center;">
+                <button class="primary" onclick="quickPickModule('mms_left_img')">上传左气泡图</button>
+                <button class="primary" onclick="quickPickModule('mms_right_img')">上传右气泡图</button>
+              </div>
+              <div style="font-size:11px; color:var(--muted);">支持直接上传自定义 PNG 气泡（带小尾巴/插画等），若未带 .9.png 黑边拉伸线会自动补全。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>控制中心磁贴图标 (Wi-Fi / 数据 / 蓝牙)</span>
+                <button class="primary" onclick="quickQsGlyphs()" title="生成透明底单色字形，防止被 OriginOS SRC_IN 染成纯色球">一键透明防纯色球</button>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; text-align:center;">
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;">
+                  <img id="thumbQuickWifi" style="width:48px;height:48px;object-fit:contain;" onerror="this.style.opacity=0.2" />
+                  <div style="font-size:11px;margin:4px 0;">Wi-Fi</div>
+                  <button onclick="quickPickModule('wifi_avatar')" style="font-size:11px;padding:4px 8px;">选图</button>
+                </div>
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;">
+                  <img id="thumbQuickData" style="width:48px;height:48px;object-fit:contain;" onerror="this.style.opacity=0.2" />
+                  <div style="font-size:11px;margin:4px 0;">移动数据</div>
+                  <button onclick="quickPickModule('data_avatar')" style="font-size:11px;padding:4px 8px;">选图</button>
+                </div>
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;">
+                  <img id="thumbQuickBt" style="width:48px;height:48px;object-fit:contain;" onerror="this.style.opacity=0.2" />
+                  <div style="font-size:11px;margin:4px 0;">蓝牙</div>
+                  <button onclick="quickPickModule('bt_avatar')" style="font-size:11px;padding:4px 8px;">选图</button>
+                </div>
+              </div>
+              <div style="font-size:11px; color:var(--muted);">上传后自动裁成圆形头像，同步写入信号格与控制中心详情图标。</div>
+            </div>
+
+            <div class="asset-card" style="grid-column: 1 / -1;">
+              <div class="title">
+                <span>超级卡包 · 付款卡背景 (com.vivo.card / SuperCard)</span>
+                <button class="primary" onclick="quickPickModule('supercard_pay', 'all')">选图覆盖全部付款卡</button>
+              </div>
+              <div id="quickPayCardGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(105px, 1fr)); gap:8px;"></div>
+              <div style="font-size:11px; color:var(--muted);">已破解 OriginOS 7 <code>SuperCard.apk</code> AAPT2 路径混淆机制：上传后自动写入明文名 + 全部 141 枚混淆名（如 <code>CA.webp / t7.webp / wq.webp</code>），自动按原尺寸裁切。</div>
+            </div>
+
+            <div class="asset-card" style="grid-column: 1 / -1;">
+              <div class="title">
+                <span>超级卡包 · 镜头套件背景 (com.vivo.card / SuperCard)</span>
+                <button class="primary" onclick="quickPickModule('supercard_camera', 'all')">选图覆盖全部镜头套件</button>
+              </div>
+              <div id="quickCameraCardGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(105px, 1fr)); gap:8px;"></div>
+              <div style="font-size:11px; color:var(--muted);">已破解 OriginOS 7 <code>SuperCard.apk</code> AAPT2 混淆名映射（如 <code>2W.webp / lm.webp / eM.webp</code> 及缩略图），替换任意槽位自动同步生效。</div>
+            </div>
+
+            <div class="asset-card" style="grid-column: 1 / -1;">
+              <div class="title">
+                <span>vivo 钱包银行卡/门禁卡背景 (com.vivo.wallet)</span>
+                <button class="primary" onclick="quickPickModule('wallet_card', 'all')">选图覆盖全部钱包卡</button>
+              </div>
+              <div id="quickWalletGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:8px;"></div>
+              <div style="font-size:11px; color:var(--muted);">用于 vivo 钱包内的银行卡、公交卡、NFC 门禁卡槽位（960×600 圆角卡面）。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>时钟表盘与世界时钟背景</span>
+                <button class="primary" onclick="quickPickModule('clock_dial')">选图替换</button>
+              </div>
+              <img class="asset-thumb" id="thumbQuickClock" />
+              <div style="font-size:11px; color:var(--muted);">对应 <code>com.android.BBKClock/clock_plate_bg_circle.png</code> 与 <code>clock_plate_day_6_0.png</code>。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>音量条与面板美化 (OriginOS 7 SystemUIPlugin)</span>
+                <button class="primary" onclick="quickPickModule('volume_bg')">换面板底图</button>
+              </div>
+              <img class="asset-thumb" id="thumbQuickVolume" />
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:12px;">
+                <label style="display:flex;align-items:center;gap:4px;"><input type="color" id="volProgColor" value="#98d7e1" /> 进度条</label>
+                <label style="display:flex;align-items:center;gap:4px;"><input type="color" id="volBgColor" value="#e4f4f7" /> 轨道底色</label>
+                <label style="display:flex;align-items:center;gap:4px;"><input type="color" id="volIconColor" value="#266c7c" /> 图标色</label>
+                <button class="primary" onclick="quickVolumeColors()">保存音量配色</button>
+              </div>
+              <div style="font-size:11px; color:var(--muted);">写入 <code>com.vivo.systemuiplugin/theme_values.xml</code> 全部 <code>vivo_volume_whole_theme_*</code> 色值与音量面板图。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>拨号盘与来电背景 (Contacts / InCallUI)</span>
+                <button class="primary" onclick="quickPickModule('dialer_bg')">选图替换</button>
+              </div>
+              <img class="asset-thumb" id="thumbQuickDialer" />
+              <div style="font-size:11px; color:var(--muted);">同步写入 <code>com.android.contacts/dialpad_bg.png</code> 与 <code>com.android.incallui/incall_bg.png</code>。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>计算器背景 (BBKCalculator)</span>
+                <button class="primary" onclick="quickPickModule('calc_bg')">选图替换</button>
+              </div>
+              <img class="asset-thumb" id="thumbQuickCalc" />
+              <div style="font-size:11px; color:var(--muted);">对应 <code>com.android.bbkcalculator/calculator_bg.png</code>。</div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>天气背景 (vivo Weather)</span>
+                <button class="primary" onclick="quickPickModule('weather_bg')">选图替换</button>
+              </div>
+              <img class="asset-thumb" id="thumbQuickWeather" />
+              <div style="font-size:11px; color:var(--muted);">对应 <code>com.vivo.weather/weather_bg.png</code>。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5.8: Fonts, Ringtones & Lockscreen Package -->
+        <div class="panel" id="panel-extras">
+          <div class="grid-2">
+            <div class="asset-card">
+              <div class="title">
+                <span>全局字体 (独立字体包 .itz)</span>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button class="primary" onclick="pickExtraFile('font', '.ttf,.otf')">上传字体</button>
+                  <button class="success" onclick="window.location.href='/api/export-font-itz'">⬇ 导出独立字体 .itz</button>
+                  <button onclick="clearExtras('fonts/')">清除</button>
+                </div>
+              </div>
+              <div id="fontStatusBox" style="padding:16px; border-radius:8px; border:1px solid var(--border); background:var(--card); min-height:110px; display:flex; flex-direction:column; justify-content:center; gap:8px;">
+                <div style="font-size:12px; color:var(--muted);" id="fontMetaText">未设置自定义字体（使用系统默认字体）</div>
+                <div id="fontPreviewText" style="font-size:18px;">OriginOS 7 Theme Studio · 字体预览 0123 ABC</div>
+                <div style="font-size:11px; color:var(--muted);">注：vivo 字体与主题分开加载，请导出独立字体 .itz 并在 i主题「字体」页单独应用。</div>
+              </div>
+            </div>
+
+            <div class="asset-card">
+              <div class="title">
+                <span>系统铃声与音效 (ringtones/)</span>
+                <button onclick="clearExtras('ringtones/')">全部清空</button>
+              </div>
+              <div class="grid-2" id="ringtoneGrid"></div>
+            </div>
+          </div>
+
+          <div class="asset-card" style="margin-top:14px;">
+            <div class="title">
+              <span>可视化锁屏编辑器 (lockscreen/manifest.xml)</span>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button onclick="pickExtraFile('lockscreen_bg', 'image/*')">换锁屏底图</button>
+                <button onclick="pickExtraFile('lockscreen_fg', 'image/png')">上传前景透明立绘</button>
+                <button onclick="pickExtraFile('lockscreen_zip', '.zip')">导入锁屏 ZIP</button>
+                <button onclick="clearExtras('lockscreen/')">清空锁屏包</button>
+                <button class="primary" onclick="saveLockscreenVisual()">保存并生成锁屏</button>
+              </div>
+            </div>
+            <div class="grid-3" style="font-size:12px;">
+              <label class="field">时钟 X 坐标 (0~1080) <input type="text" id="lsClockX" value="540" oninput="previewLockscreenLive()" /></label>
+              <label class="field">时钟 Y 坐标 (0~2400) <input type="text" id="lsClockY" value="280" oninput="previewLockscreenLive()" /></label>
+              <label class="field">时钟字号 / 颜色
+                <div style="display:flex; gap:6px;">
+                  <input type="text" id="lsClockSize" value="150" style="flex:1;" oninput="previewLockscreenLive()" />
+                  <input type="color" id="lsClockColor" value="#ffffff" oninput="previewLockscreenLive()" />
+                </div>
+              </label>
+              <label class="field">日期 Y 坐标 <input type="text" id="lsDateY" value="440" oninput="previewLockscreenLive()" /></label>
+              <label class="field">日期字号 / 颜色
+                <div style="display:flex; gap:6px;">
+                  <input type="text" id="lsDateSize" value="36" style="flex:1;" oninput="previewLockscreenLive()" />
+                  <input type="color" id="lsDateColor" value="#e2f1f5" oninput="previewLockscreenLive()" />
+                </div>
+              </label>
+              <label class="field">底部提示语 / 颜色
+                <div style="display:flex; gap:6px;">
+                  <input type="text" id="lsTagline" value="向右滑动解锁" style="flex:1;" oninput="previewLockscreenLive()" />
+                  <input type="color" id="lsTaglineColor" value="#ffffff" oninput="previewLockscreenLive()" />
+                </div>
+              </label>
+              <label class="field">前景立绘 X / Y 偏移
+                <div style="display:flex; gap:6px;">
+                  <input type="text" id="lsFgX" value="0" style="flex:1;" oninput="previewLockscreenLive()" />
+                  <input type="text" id="lsFgY" value="360" style="flex:1;" oninput="previewLockscreenLive()" />
+                </div>
+              </label>
+              <label class="field">前景立绘缩放 (%) <input type="text" id="lsFgScale" value="100" oninput="previewLockscreenLive()" /></label>
+              <label class="field" style="justify-content:center;">
+                <span style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="lsSliderEnabled" checked onchange="previewLockscreenLive()" /> 启用底部滑动解锁文字</span>
+              </label>
+            </div>
+            <div id="lockscreenStatusBox" style="padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--card); font-size:12px; color:var(--muted);">
+              未导入自定义锁屏代码包（当前使用静态锁屏壁纸）。
+            </div>
+            <details>
+              <summary style="font-size:12px; cursor:pointer; color:var(--muted);">查看 / 手动编辑 lockscreen/manifest.xml 源码</summary>
+              <textarea id="lsXmlEditor" rows="7" style="width:100%; margin-top:8px; font-family:Consolas, monospace; font-size:12px;"></textarea>
+              <button onclick="saveLockscreenXmlRaw()" style="margin-top:6px;">仅保存 XML 源码</button>
+            </details>
+          </div>
+
+          <div class="asset-card" style="margin-top:14px;">
+            <div class="title">
+              <span>提示：如 OriginOS 新版限制了第三方 XML 锁屏脚本，仍会保底生效静态锁屏壁纸。</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 6: Global Module Workshop -->
+        <div class="panel" id="panel-modules">
+          <div class="adb-box">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <span style="font-size:13px; font-weight:600;">选择系统模块：</span>
+              <select id="moduleSelect" onchange="loadModuleDetail()" style="min-width:240px;"></select>
+              <button onclick="addCustomModule()">+ 新增包名模块</button>
+              <button onclick="addModuleAsset()">+ 新增/上传图片资源</button>
+            </div>
+            <div style="margin-top:8px; font-size:12px; color:var(--muted);" id="moduleDescText">
+              支持编辑任意系统模块的图片资源（含 .9.png 气泡、弹窗、表盘、卡包背景）及 theme_values.xml。
+            </div>
+          </div>
+
+          <div class="adb-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:13px; font-weight:600;">theme_values.xml 配置源码</span>
+              <button class="primary" onclick="saveModuleXml()">保存 XML</button>
+            </div>
+            <textarea id="moduleXmlEditor" rows="6" style="width:100%; font-family:Consolas, monospace; font-size:12px;"></textarea>
+          </div>
+
+          <div class="icon-grid" id="moduleAssetGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Phone Simulator -->
+    <div class="preview-pane">
+      <div class="preview-controls">
+        <button class="active" data-preview="desktop" onclick="setPreviewMode('desktop')">桌面</button>
+        <button data-preview="lockscreen" onclick="setPreviewMode('lockscreen')">锁屏</button>
+        <button data-preview="control-center" onclick="setPreviewMode('control-center')">控制中心</button>
+        <button data-preview="settings-light" onclick="setPreviewMode('settings-light')">设置(浅)</button>
+        <button data-preview="settings-dark" onclick="setPreviewMode('settings-dark')">设置(深)</button>
+      </div>
+
+      <div class="phone-frame">
+        <div class="phone-statusbar" id="phoneStatusbar" style="color:#fff;">
+          <span>00:38</span>
+          <span>5G 60%</span>
+        </div>
+        <div class="phone-screen" id="phoneScreen"></div>
+      </div>
+      <div style="font-size:11px; color:var(--muted); text-align:center;">
+        支持将 .itz 文件直接拖入窗口打开
+      </div>
+    </div>
+  </div>
+
+  <div class="drop-overlay" id="dropOverlay">松开以加载 .itz 主题包</div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let summary = null;
+    let previewMode = 'desktop';
+    let currentIconPage = 1;
+    let cacheBust = Date.now();
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.style.display = 'block';
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.style.display = 'none', 2800);
+    }
+
+    function assetUrl(scope, name) {
+      return `/api/asset?scope=${encodeURIComponent(scope)}&name=${encodeURIComponent(name)}&t=${cacheBust}`;
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    async function loadSystemUiIcons() {
+      const q = (document.getElementById('systemuiSearch')?.value || '').trim();
+      const res = await fetch(`/api/systemui-icons?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      const grid = document.getElementById('systemuiIconGrid');
+      grid.innerHTML = '';
+      if (data.items.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);font-size:12px;">未找到匹配的图标</div>';
+        return;
+      }
+      data.items.forEach(({ name, label, customized }) => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        div.title = `${label ? label + ' - ' : ''}点击${customized ? '替换' : '绘制'} ${name}`;
+        div.onclick = () => pickAsset('systemui_both', name, 'image/*', false);
+        const mediaHtml = customized
+          ? `<img src="${assetUrl('com.android.systemui', name)}" loading="lazy" />`
+          : `<div class="icon-placeholder">◐</div>`;
+        div.innerHTML = `
+          <span class="icon-state ${customized ? 'custom' : 'default'}">${customized ? '已绘' : '默认'}</span>
+          ${mediaHtml}
+          <div class="app-label">${label || name.replace(/\.png$/i, '')}</div>
+          <div class="pkg">${name}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    async function saveSettingsStrings() {
+      const payload = {};
+      document.querySelectorAll('#settingsStringsGrid input[data-str-key]').forEach(inp => {
+        payload[inp.dataset.strKey] = inp.value;
+      });
+      const res = await fetch('/api/settings-strings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast('设置页文本已保存');
+        await fetchSummary();
+      }
+    }
+
+    async function saveSystemUiColors() {
+      const payload = {
+        qs_main_color: document.getElementById('colorQsMain').value,
+        switcher_text_light: document.getElementById('colorSwitcherText').value,
+        statusbar_text_color: document.getElementById('colorStatusbarText').value,
+        battery_text_black: document.getElementById('colorBatteryBlack').value,
+        battery_text_white: document.getElementById('colorBatteryWhite').value,
+      };
+      const res = await fetch('/api/systemui-colors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast('控制中心与状态栏配色已保存');
+        await fetchSummary();
+      }
+    }
+
+    async function refreshModuleSelect() {
+      const sel = document.getElementById('moduleSelect');
+      if (!sel || !summary || !summary.modules) return;
+      const prev = sel.value || 'com.android.mms';
+      sel.innerHTML = summary.modules.map(m => `<option value="${m}">${m}</option>`).join('');
+      if (summary.modules.includes(prev)) sel.value = prev;
+      await loadModuleDetail();
+    }
+
+    async function loadModuleDetail() {
+      const modName = document.getElementById('moduleSelect')?.value;
+      if (!modName) return;
+      const res = await fetch(`/api/module-detail?name=${encodeURIComponent(modName)}`);
+      const data = await res.json();
+      document.getElementById('moduleDescText').textContent = `${data.title} — 已绘制 ${data.custom_total} 项，点击任意卡片即可替换或上传。`;
+      document.getElementById('moduleXmlEditor').value = data.xml || '';
+      const grid = document.getElementById('moduleAssetGrid');
+      grid.innerHTML = '';
+      if (data.items.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);font-size:12px;">该模块暂无预设图片项，可点击上方「+ 新增/上传图片资源」直接添加。</div>';
+        return;
+      }
+      data.items.forEach(({ name, label, customized }) => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        div.title = `${label ? label + ' - ' : ''}点击${customized ? '替换' : '上传'} ${name}`;
+        div.onclick = () => pickAsset(modName, name, 'image/*', false);
+        const mediaHtml = customized
+          ? `<img src="${assetUrl(modName, name)}" loading="lazy" />`
+          : `<div class="icon-placeholder">❖</div>`;
+        div.innerHTML = `
+          <span class="icon-state ${customized ? 'custom' : 'default'}">${customized ? '已绘' : '默认'}</span>
+          ${mediaHtml}
+          <div class="app-label">${label || name}</div>
+          <div class="pkg">${name}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    async function saveModuleXml() {
+      const modName = document.getElementById('moduleSelect').value;
+      const xml = document.getElementById('moduleXmlEditor').value;
+      const res = await fetch('/api/module-xml', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ module: modName, xml }),
+      });
+      if (res.ok) {
+        toast(`已保存 ${modName}/theme_values.xml`);
+        await fetchSummary();
+      }
+    }
+
+    function addCustomModule() {
+      const name = prompt('请输入系统模块包名（例如 com.vivo.gallery 或 com.android.dialer）：');
+      if (!name || !name.trim()) return;
+      const sel = document.getElementById('moduleSelect');
+      const clean = name.trim();
+      if (![...sel.options].some(o => o.value === clean)) {
+        const opt = document.createElement('option');
+        opt.value = clean;
+        opt.textContent = clean;
+        sel.appendChild(opt);
+      }
+      sel.value = clean;
+      loadModuleDetail();
+    }
+
+    function addModuleAsset() {
+      const modName = document.getElementById('moduleSelect').value;
+      const fname = prompt(`请输入要上传到 ${modName} 的文件名（如 sms_left_bg.9.png 或 clock_dial.png）：`);
+      if (!fname || !fname.trim()) return;
+      pickAsset(modName, fname.trim(), 'image/*', false);
+    }
+
+    async function quickVolumeColors() {
+      const res = await fetch('/api/module-quick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'volume_color',
+          progress: document.getElementById('volProgColor').value,
+          bg: document.getElementById('volBgColor').value,
+          icon: document.getElementById('volIconColor').value,
+        }),
+      });
+      const d = await res.json();
+      toast(d.msg || '完成');
+      await fetchSummary();
+    }
+
+    async function quickMmsBubble() {
+      const color = document.getElementById('mmsBubbleColor').value;
+      const res = await fetch('/api/module-quick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mms_bubble', color }),
+      });
+      const d = await res.json();
+      toast(d.msg || '完成');
+      document.getElementById('moduleSelect').value = 'com.android.mms';
+      await fetchSummary();
+    }
+
+    function quickPickModule(action, slot = '') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = () => {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = async () => {
+          const res = await fetch('/api/module-quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, data: r.result, slot }),
+          });
+          const d = await res.json();
+          toast(d.msg || '完成');
+          await fetchSummary();
+        };
+        r.readAsDataURL(f);
+      };
+      input.click();
+    }
+
+    function renderExtras() {
+      const ex = (summary && summary.extras) || { font_name: '', font_size: 0, ringtones: [], lockscreen_files: [] };
+      const fontMeta = document.getElementById('fontMetaText');
+      const fontPrev = document.getElementById('fontPreviewText');
+      if (ex.font_name) {
+        fontMeta.textContent = `已加载: ${ex.font_name} (${(ex.font_size / 1024 / 1024).toFixed(2)} MB)`;
+        const styleId = 'dynamic-theme-font-style';
+        let st = document.getElementById(styleId);
+        if (!st) {
+          st = document.createElement('style');
+          st.id = styleId;
+          document.head.appendChild(st);
+        }
+        st.textContent = `@font-face { font-family: 'ThemeCustomFont'; src: url('${assetUrl('root', ex.font_name)}'); }`;
+        fontPrev.style.fontFamily = "'ThemeCustomFont', sans-serif";
+      } else {
+        fontMeta.textContent = '未设置自定义字体（使用系统默认字体）';
+        fontPrev.style.fontFamily = 'inherit';
+      }
+
+      const lsBox = document.getElementById('lockscreenStatusBox');
+      if (ex.lockscreen_files && ex.lockscreen_files.length > 0) {
+        lsBox.innerHTML = `<span style="font-weight:600;color:var(--text);">已生成/导入 ${ex.lockscreen_files.length} 个锁屏文件：</span>` +
+          ex.lockscreen_files.slice(0, 12).join(', ') +
+          (ex.lockscreen_files.length > 12 ? ` ... 等共 ${ex.lockscreen_files.length} 项` : '');
+      } else {
+        lsBox.textContent = '未生成自定义锁屏包（当前使用静态锁屏壁纸，点右上角“保存并生成锁屏”即可创建）。';
+      }
+
+      if (ex.lockscreen_cfg) {
+        const lc = ex.lockscreen_cfg;
+        document.getElementById('lsClockX').value = lc.clock_x ?? 540;
+        document.getElementById('lsClockY').value = lc.clock_y ?? 280;
+        document.getElementById('lsClockSize').value = lc.clock_size ?? 150;
+        document.getElementById('lsClockColor').value = lc.clock_color || '#ffffff';
+        document.getElementById('lsDateY').value = lc.date_y ?? 440;
+        document.getElementById('lsDateSize').value = lc.date_size ?? 36;
+        document.getElementById('lsDateColor').value = lc.date_color || '#e2f1f5';
+        document.getElementById('lsTagline').value = lc.tagline ?? '向右滑动解锁';
+        document.getElementById('lsTaglineColor').value = lc.tagline_color || '#ffffff';
+        document.getElementById('lsFgX').value = lc.fg_x ?? 0;
+        document.getElementById('lsFgY').value = lc.fg_y ?? 360;
+        document.getElementById('lsFgScale').value = lc.fg_scale ?? 100;
+        document.getElementById('lsSliderEnabled').checked = lc.slider_enabled !== false;
+        document.getElementById('lsXmlEditor').value = lc.xml || '';
+      }
+
+      const slots = [
+        ['ringtone', '来电铃声'],
+        ['notification', '通知 / 短信提示音'],
+        ['alarm', '闹钟铃声'],
+        ['lock', '锁屏 / 充电音效'],
+      ];
+      document.getElementById('ringtoneGrid').innerHTML = slots.map(([slot, label]) => {
+        const matched = (ex.ringtones || []).find(r => r.startsWith(`ringtones/${slot}.`));
+        return `
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px;background:var(--card);display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;font-weight:600;">${label}</span>
+              <button onclick="pickExtraFile('ringtone', '.mp3,.ogg,.wav', '${slot}')">上传音频</button>
+            </div>
+            ${matched
+              ? `<audio controls src="${assetUrl('root', matched)}" style="width:100%;height:32px;"></audio>`
+              : `<span style="font-size:11px;color:var(--muted);">未设置（使用系统默认）</span>`
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    function pickExtraFile(kind, accept, slot = '') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = accept;
+      input.onchange = () => {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = async () => {
+          toast(`正在上传 ${f.name}...`);
+          const res = await fetch('/api/extras/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kind, filename: f.name, slot, data: r.result }),
+          });
+          const d = await res.json();
+          toast(d.msg || '完成');
+          await fetchSummary();
+        };
+        r.readAsDataURL(f);
+      };
+      input.click();
+    }
+
+    async function clearExtras(prefix) {
+      const res = await fetch(`/api/extras?prefix=${encodeURIComponent(prefix)}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast('已清除');
+        await fetchSummary();
+      }
+    }
+
+    function previewLockscreenLive() {
+      if (previewMode !== 'lockscreen') setPreviewMode('lockscreen');
+      else renderPhonePreview();
+    }
+
+    async function saveLockscreenVisual() {
+      const payload = {
+        clock_x: parseInt(document.getElementById('lsClockX').value || '540', 10),
+        clock_y: parseInt(document.getElementById('lsClockY').value || '280', 10),
+        clock_size: parseInt(document.getElementById('lsClockSize').value || '150', 10),
+        clock_color: document.getElementById('lsClockColor').value,
+        date_y: parseInt(document.getElementById('lsDateY').value || '440', 10),
+        date_size: parseInt(document.getElementById('lsDateSize').value || '36', 10),
+        date_color: document.getElementById('lsDateColor').value,
+        tagline: document.getElementById('lsTagline').value,
+        tagline_color: document.getElementById('lsTaglineColor').value,
+        fg_x: parseInt(document.getElementById('lsFgX').value || '0', 10),
+        fg_y: parseInt(document.getElementById('lsFgY').value || '360', 10),
+        fg_scale: parseInt(document.getElementById('lsFgScale').value || '100', 10),
+        slider_enabled: document.getElementById('lsSliderEnabled').checked,
+      };
+      const res = await fetch('/api/lockscreen/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast('已生成 lockscreen/manifest.xml');
+        await fetchSummary();
+        setPreviewMode('lockscreen');
+      }
+    }
+
+    async function saveLockscreenXmlRaw() {
+      const xml = document.getElementById('lsXmlEditor').value;
+      const res = await fetch('/api/lockscreen/xml', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ xml }),
+      });
+      if (res.ok) {
+        toast('已保存锁屏 XML 源码');
+        await fetchSummary();
+      }
+    }
+
+    async function fetchSummary() {
+      const res = await fetch('/api/summary');
+      summary = await res.json();
+      cacheBust = Date.now();
+      renderSummary();
+    }
+
+    function renderSummary() {
+      const badge = document.getElementById('loadedBadge');
+      if (!summary || !summary.loaded) {
+        badge.textContent = '未加载主题';
+        return;
+      }
+      badge.textContent = `${summary.source_name} (${summary.metadata.sysromver || '?'})`;
+      document.getElementById('iconCountLabel').textContent = summary.icon_count;
+      document.getElementById('launcherCountLabel').textContent = summary.launcher_count || 0;
+      document.getElementById('settingsCountLabel').textContent = summary.settings_icon_count;
+      document.getElementById('systemuiCountLabel').textContent = summary.systemui_icon_count || 0;
+
+      if (summary.settings_strings) {
+        const sg = document.getElementById('settingsStringsGrid');
+        sg.innerHTML = summary.settings_strings.map(s => `
+          <div class="field" style="margin-bottom:6px;">
+            <label>${s.label} <span style="opacity:0.6;font-weight:400;">(${s.key})</span></label>
+            <input type="text" data-str-key="${s.key}" value="${s.value.replace(/"/g, '&quot;')}" placeholder="${s.default}" />
+          </div>
+        `).join('');
+      }
+
+      if (summary.systemui_colors) {
+        document.getElementById('colorQsMain').value = summary.systemui_colors.qs_main_color || '#98d7e1';
+        document.getElementById('colorSwitcherText').value = summary.systemui_colors.switcher_text_light || '#98d7e1';
+        document.getElementById('colorStatusbarText').value = summary.systemui_colors.statusbar_text_color || '#000000';
+        document.getElementById('colorBatteryBlack').value = summary.systemui_colors.battery_text_black || '#ffffff';
+        document.getElementById('colorBatteryWhite').value = summary.systemui_colors.battery_text_white || '#000000';
+        if (document.getElementById('volProgColor')) {
+          document.getElementById('volProgColor').value = summary.systemui_colors.volume_progress_color || '#98d7e1';
+          document.getElementById('volBgColor').value = summary.systemui_colors.volume_bg_color || '#e4f4f7';
+          document.getElementById('volIconColor').value = summary.systemui_colors.volume_icon_color || '#266c7c';
+        }
+      }
+
+      const m = summary.metadata;
+      document.getElementById('metaTitle').value = m.title || '';
+      document.getElementById('metaAuthor').value = m.author || '';
+      document.getElementById('metaDesigner').value = m.designer || '';
+      document.getElementById('metaVersion').value = m.version || '';
+      document.getElementById('metaRomVer').value = m.sysromver || '';
+      document.getElementById('metaId').value = m.id || '';
+      document.getElementById('metaDesc').value = m.description || '';
+
+      // Previews
+      const pGrid = document.getElementById('previewGrid');
+      pGrid.innerHTML = '';
+      ['preview/preview_lockscreen_0.jpg', 'preview/preview_lockscreen_1.jpg', 'preview/preview_lockscreen_2.jpg'].forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'asset-card';
+        card.innerHTML = `
+          <div class="title"><span>${p.split('/')[1]}</span><button onclick="pickAsset('root','${p}','image/*')">替换</button></div>
+          <img class="asset-thumb" src="${assetUrl('root', p)}" onerror="this.removeAttribute('src')" />
+        `;
+        pGrid.appendChild(card);
+      });
+
+      // Wallpapers
+      document.getElementById('thumbWallpaper').src = assetUrl('root', 'wallpaper/default_wallpaper.jpg');
+      document.getElementById('thumbLockscreen').src = assetUrl('root', 'wallpaper/default_lock_wallpaper.jpg');
+      document.getElementById('thumbVivoLight').src = assetUrl('vivo', 'vigour_window_settting_background_light.png');
+      document.getElementById('thumbVivoDark').src = assetUrl('vivo', 'vigour_window_settting_background_dark.png');
+
+      // Quick customization card previews
+      document.getElementById('thumbQuickDialog').src = assetUrl('vivo', 'vigour_dialog_full_light.9.png');
+      const swOn = document.getElementById('thumbSwitchOn');
+      const swOff = document.getElementById('thumbSwitchOff');
+      if (swOn) swOn.src = assetUrl('vivo', 'vigour_bool_btn_bg_on_light.png');
+      if (swOff) swOff.src = assetUrl('vivo', 'vigour_bool_btn_bg_off_light.png');
+      const pinK = document.getElementById('thumbPinKey');
+      const pinD = document.getElementById('thumbPinDot');
+      const lockQ = document.getElementById('thumbQuickLockBg');
+      if (pinK) pinK.src = assetUrl('com.android.systemui', 'vivo_keyguard_num_view_shape_bg.png');
+      if (pinD) pinD.src = assetUrl('com.android.systemui', 'vivo_pin_scr.png');
+      if (lockQ) lockQ.src = assetUrl('com.vivo.systemuiplugin', 'vivo_keyguard_quick_tool_default_bg_view.png');
+      document.getElementById('thumbQuickMmsLeft').src = assetUrl('com.android.mms', 'sms_left_bg.9.png');
+      document.getElementById('thumbQuickMmsRight').src = assetUrl('com.android.mms', 'sms_right_bg.9.png');
+      document.getElementById('thumbQuickWifi').src = assetUrl('com.vivo.systemuiplugin', 'vivo_super_qs_wifi_on.png');
+      document.getElementById('thumbQuickData').src = assetUrl('com.vivo.systemuiplugin', 'vivo_super_qs_data_switch_on.png');
+      document.getElementById('thumbQuickBt').src = assetUrl('com.vivo.systemuiplugin', 'vivo_super_qs_bluetooth_on.png');
+      document.getElementById('thumbQuickClock').src = assetUrl('com.android.BBKClock', 'clock_plate_bg_circle.png');
+      document.getElementById('thumbQuickVolume').src = assetUrl('com.vivo.systemuiplugin', 'vivo_footer_volume_bg.png');
+      document.getElementById('thumbQuickDialer').src = assetUrl('com.android.contacts', 'dialpad_bg.png');
+      document.getElementById('thumbQuickCalc').src = assetUrl('com.android.bbkcalculator', 'calculator_bg.png');
+      document.getElementById('thumbQuickWeather').src = assetUrl('com.vivo.weather', 'weather_bg.png');
+
+      renderExtras();
+
+      const payCardSlots = [
+        ['bg_paycard01.png', '付款卡01(默认)'],
+        ['bg_paycard01_iqoo.png', '付款卡01(iQOO)'],
+        ['bg_paycard00.png', '付款卡00'],
+        ['bg_paycard02.png', '付款卡02'],
+        ['bg_paycard03.png', '付款卡03'],
+        ['bg_paycard04.png', '付款卡04'],
+        ['bg_paycard05.png', '付款卡05'],
+        ['bg_paycard06_iqoo.png', '付款卡06(iQOO)'],
+        ['bg_paycard07.png', '付款卡07'],
+        ['bg_paycard10.png', '付款卡10'],
+        ['bg_paycard11.png', '付款卡11'],
+        ['bg_paycard12.png', '付款卡12'],
+        ['bg_paycard13.png', '付款卡13'],
+        ['bg_paycard14.png', '付款卡14'],
+        ['bg_paycard15.png', '付款卡15'],
+      ];
+      const payGrid = document.getElementById('quickPayCardGrid');
+      if (payGrid) {
+        payGrid.innerHTML = payCardSlots.map(([fn, lbl]) => `
+          <div onclick="quickPickModule('supercard_pay', '${fn}')" style="cursor:pointer;border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center;background:var(--card);">
+            <img src="${assetUrl('com.vivo.card', fn)}" style="width:100%;height:78px;object-fit:cover;border-radius:6px;" onerror="this.style.opacity=0.2" />
+            <div style="font-size:11px;margin-top:4px;">${lbl}</div>
+          </div>
+        `).join('');
+      }
+
+      const camCardSlots = [
+        ['bg_camera_card01.png', '镜头套件01'],
+        ['bg_camera_card02.png', '镜头套件02'],
+        ['bg_camera_card03.png', '镜头套件03'],
+        ['bg_camera_card04.png', '镜头套件04'],
+        ['bg_camera_card04_iqoo.png', '镜头套件04(iQOO)'],
+        ['bg_camera_card05.png', '镜头套件05'],
+        ['bg_camera_card06_iqoo.png', '镜头套件06(iQOO)'],
+        ['bg_camera_card07.png', '镜头套件07'],
+      ];
+      const camGrid = document.getElementById('quickCameraCardGrid');
+      if (camGrid) {
+        camGrid.innerHTML = camCardSlots.map(([fn, lbl]) => `
+          <div onclick="quickPickModule('supercard_camera', '${fn}')" style="cursor:pointer;border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center;background:var(--card);">
+            <img src="${assetUrl('com.vivo.card', fn)}" style="width:100%;height:78px;object-fit:cover;border-radius:6px;" onerror="this.style.opacity=0.2" />
+            <div style="font-size:11px;margin-top:4px;">${lbl}</div>
+          </div>
+        `).join('');
+      }
+
+      const walletSlots = [
+        ['card_bag_open_card_bg.png', '卡位1(开启卡)'],
+        ['bank_card_add_card_bg.png', '卡位2(添卡)'],
+        ['bank_card_bg_blue.png', '卡位3(蓝)'],
+        ['bank_card_bg_green.png', '卡位4(绿)'],
+        ['bank_card_bg_red.png', '卡位5(红)'],
+        ['bank_card_bg_yellow.png', '卡位6(黄)'],
+        ['bank_card_bg_gray.png', '卡位7(灰)'],
+        ['buscard_select_card_bg.png', '公交卡'],
+        ['ic_nfccard_bg.png', 'NFC门禁卡'],
+      ];
+      document.getElementById('quickWalletGrid').innerHTML = walletSlots.map(([fn, lbl]) => `
+        <div onclick="quickPickModule('wallet_card', '${fn}')" style="cursor:pointer;border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center;background:var(--card);">
+          <img src="${assetUrl('com.vivo.wallet', fn)}" style="width:100%;height:56px;object-fit:cover;border-radius:6px;" onerror="this.style.opacity=0.2" />
+          <div style="font-size:11px;margin-top:4px;">${lbl}</div>
+        </div>
+      `).join('');
+
+      loadIcons(currentIconPage);
+      loadLauncherIcons();
+      loadSettingsIcons();
+      loadSystemUiIcons();
+      refreshModuleSelect();
+      renderPhonePreview();
+    }
+
+    async function loadIcons(page = 1) {
+      currentIconPage = page;
+      const q = document.getElementById('iconSearch').value.trim();
+      const filter = document.getElementById('iconFilter').value;
+      const res = await fetch(`/api/icons?q=${encodeURIComponent(q)}&filter=${encodeURIComponent(filter)}&page=${page}&size=48`);
+      const data = await res.json();
+      const grid = document.getElementById('iconGrid');
+      grid.innerHTML = '';
+      data.items.forEach(({ name, label, customized }) => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        div.title = `${label ? label + ' - ' : ''}点击${customized ? '替换' : '绘制'} ${name}`;
+        div.onclick = () => pickAsset('icons', name, 'image/*', true);
+        const pkgShort = name.replace(/\.png$/i, '');
+        const ch = (label || pkgShort).slice(0, 1).toUpperCase();
+        const mediaHtml = customized
+          ? `<img src="${assetUrl('icons', name)}" loading="lazy" />`
+          : `<div class="icon-placeholder">${ch}</div>`;
+        div.innerHTML = `
+          <span class="icon-state ${customized ? 'custom' : 'default'}">${customized ? '已绘' : '默认'}</span>
+          ${mediaHtml}
+          <div class="app-label">${label || pkgShort}</div>
+          <div class="pkg">${pkgShort}</div>
+        `;
+        grid.appendChild(div);
+      });
+
+      const totalPages = Math.max(1, Math.ceil(data.total / data.size));
+      document.getElementById('iconPagination').innerHTML = `
+        <button ${page <= 1 ? 'disabled' : ''} onclick="loadIcons(${page - 1})">上一页</button>
+        <span>第 ${page} / ${totalPages} 页（共 ${data.total} 项，已绘制 ${data.custom_total} 个）</span>
+        <button ${page >= totalPages ? 'disabled' : ''} onclick="loadIcons(${page + 1})">下一页</button>
+      `;
+    }
+
+    async function loadLauncherIcons() {
+      const res = await fetch('/api/launcher-icons');
+      const data = await res.json();
+      if (data.config) {
+        document.getElementById('lcWidth').value = data.config.width;
+        document.getElementById('lcHeight').value = data.config.height;
+        document.getElementById('lcLeft').value = data.config.leftoffset;
+        document.getElementById('lcTop').value = data.config.topoffset;
+      }
+      const bgEl = document.getElementById('launcherPreviewBg');
+      const covEl = document.getElementById('launcherPreviewCover');
+      bgEl.style.display = '';
+      covEl.style.display = '';
+      bgEl.src = assetUrl('root', 'launcher/icon_bg_default.png');
+      covEl.src = assetUrl('root', 'launcher/icon_cover.png');
+
+      const grid = document.getElementById('launcherIconGrid');
+      grid.innerHTML = '';
+      data.items.forEach(({ name, label, customized }) => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        div.title = `${label} - 点击${customized ? '替换' : '上传'} ${name}`;
+        div.onclick = () => pickAsset('root', name, 'image/*', false);
+        const mediaHtml = customized
+          ? `<img src="${assetUrl('root', name)}" loading="lazy" />`
+          : `<div class="icon-placeholder">▢</div>`;
+        div.innerHTML = `
+          <span class="icon-state ${customized ? 'custom' : 'default'}">${customized ? '已绘' : '默认'}</span>
+          ${mediaHtml}
+          <div class="app-label">${label}</div>
+          <div class="pkg">${name.replace('launcher/', '')}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    async function saveLauncherConfig() {
+      const payload = {
+        width: parseInt(document.getElementById('lcWidth').value || '52', 10),
+        height: parseInt(document.getElementById('lcHeight').value || '52', 10),
+        leftoffset: parseInt(document.getElementById('lcLeft').value || '0', 10),
+        topoffset: parseInt(document.getElementById('lcTop').value || '0', 10),
+      };
+      const res = await fetch('/api/launcher-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast('iconsize.xml 尺寸配置已保存');
+        await fetchSummary();
+      }
+    }
+
+    async function generateLauncherKit() {
+      const color = document.getElementById('kitColor').value;
+      const ornament = document.getElementById('kitOrnament').value;
+      const res = await fetch('/api/launcher-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ color, ornament }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        toast(`已生成 ${d.count} 个统一套框资源 (${color})`);
+        await fetchSummary();
+      }
+    }
+
+    async function loadSettingsIcons() {
+      const res = await fetch('/api/settings-icons');
+      const data = await res.json();
+      const grid = document.getElementById('settingsIconGrid');
+      grid.innerHTML = '';
+      data.items.forEach(({ name, label, customized }) => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        div.title = `${label ? label + ' - ' : ''}点击${customized ? '替换' : '绘制'} ${name}`;
+        div.onclick = () => pickAsset('com.android.settings', name, 'image/*', false);
+        const mediaHtml = customized
+          ? `<img src="${assetUrl('com.android.settings', name)}" loading="lazy" />`
+          : `<div class="icon-placeholder">⚙</div>`;
+        div.innerHTML = `
+          <span class="icon-state ${customized ? 'custom' : 'default'}">${customized ? '已绘' : '默认'}</span>
+          ${mediaHtml}
+          <div class="app-label">${label || name.replace(/\.png$/i, '')}</div>
+          <div class="pkg">${name}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    async function loadSystemUiIcons() {
+      const q = (document.getElementById('systemuiSearch')?.value || '').trim();
+      const res = await fetch(`/api/systemui-icons?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      const grid = document.getElementById('systemuiIconGrid');
+      grid.innerHTML = '';
+      if (data.items.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);font-size:12px;">未找到匹配的图标</div>';
+        return;
+      }
+      data.items.forEach(({ name, label, customized }) => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        div.title = `${label ? label + ' - ' : ''}点击${customized ? '替换' : '绘制'} ${name}`;
+        div.onclick = () => pickAsset('systemui_both', name, 'image/*', false);
+        const mediaHtml = customized
+          ? `<img src="${assetUrl('com.android.systemui', name)}" loading="lazy" />`
+          : `<div class="icon-placeholder">◐</div>`;
+        div.innerHTML = `
+          <span class="icon-state ${customized ? 'custom' : 'default'}">${customized ? '已绘' : '默认'}</span>
+          ${mediaHtml}
+          <div class="app-label">${label || name.replace(/\.png$/i, '')}</div>
+          <div class="pkg">${name}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    async function saveSettingsStrings() {
+      const payload = {};
+      document.querySelectorAll('#settingsStringsGrid input[data-str-key]').forEach(inp => {
+        payload[inp.dataset.strKey] = inp.value;
+      });
+      const res = await fetch('/api/settings-strings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast('设置页文本已保存');
+        await fetchSummary();
+      }
+    }
+
+    async function saveSystemUiColors() {
+      const payload = {
+        qs_main_color: document.getElementById('colorQsMain').value,
+        switcher_text_light: document.getElementById('colorSwitcherText').value,
+        statusbar_text_color: document.getElementById('colorStatusbarText').value,
+        battery_text_black: document.getElementById('colorBatteryBlack').value,
+        battery_text_white: document.getElementById('colorBatteryWhite').value,
+      };
+      const res = await fetch('/api/systemui-colors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast('控制中心与状态栏配色已保存');
+        await fetchSummary();
+      }
+    }
+
+    async function refreshModuleSelect() {
+      const sel = document.getElementById('moduleSelect');
+      if (!sel || !summary || !summary.modules) return;
+      const prev = sel.value || 'com.android.mms';
+      sel.innerHTML = summary.modules.map(m => `<option value="${m}">${m}</option>`).join('');
+      if (summary.modules.includes(prev)) sel.value = prev;
+      await loadModuleDetail();
+    }
+
+    async function loadModuleDetail() {
+      const modName = document.getElementById('moduleSelect')?.value;
+      if (!modName) return;
+      const res = await fetch(`/api/module-detail?name=${encodeURIComponent(modName)}`);
+      const data = await res.json();
+      document.getElementById('moduleDescText').textContent = `${data.title} — 已绘制 ${data.custom_total} 项，点击任意卡片即可替换或上传。`;
+      document.getElementById('moduleXmlEditor').value = data.xml || '';
+      const grid = document.getElementById('moduleAssetGrid');
+      grid.innerHTML = '';
+      if (data.items.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);font-size:12px;">该模块暂无预设图片项，可点击上方「+ 新增/上传图片资源」直接添加。</div>';
+        return;
+      }
+      data.items.forEach(({ name, label, customized }) => {
+        const div = document.createElement('div');
+        div.className = 'icon-item';
+        div.title = `${label ? label + ' - ' : ''}点击${customized ? '替换' : '上传'} ${name}`;
+        div.onclick = () => pickAsset(modName, name, 'image/*', false);
+        const mediaHtml = customized
+          ? `<img src="${assetUrl(modName, name)}" loading="lazy" />`
+          : `<div class="icon-placeholder">❖</div>`;
+        div.innerHTML = `
+          <span class="icon-state ${customized ? 'custom' : 'default'}">${customized ? '已绘' : '默认'}</span>
+          ${mediaHtml}
+          <div class="app-label">${label || name}</div>
+          <div class="pkg">${name}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    async function saveModuleXml() {
+      const modName = document.getElementById('moduleSelect').value;
+      const xml = document.getElementById('moduleXmlEditor').value;
+      const res = await fetch('/api/module-xml', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ module: modName, xml }),
+      });
+      if (res.ok) {
+        toast(`已保存 ${modName}/theme_values.xml`);
+        await fetchSummary();
+      }
+    }
+
+    function addCustomModule() {
+      const name = prompt('请输入系统模块包名（例如 com.vivo.gallery 或 com.android.dialer）：');
+      if (!name || !name.trim()) return;
+      const sel = document.getElementById('moduleSelect');
+      const clean = name.trim();
+      if (![...sel.options].some(o => o.value === clean)) {
+        const opt = document.createElement('option');
+        opt.value = clean;
+        opt.textContent = clean;
+        sel.appendChild(opt);
+      }
+      sel.value = clean;
+      loadModuleDetail();
+    }
+
+    function addModuleAsset() {
+      const modName = document.getElementById('moduleSelect').value;
+      const fname = prompt(`请输入要上传到 ${modName} 的文件名（如 sms_left_bg.9.png 或 clock_dial.png）：`);
+      if (!fname || !fname.trim()) return;
+      pickAsset(modName, fname.trim(), 'image/*', false);
+    }
+
+    async function quickVolumeColors() {
+      const res = await fetch('/api/module-quick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'volume_color',
+          progress: document.getElementById('volProgColor').value,
+          bg: document.getElementById('volBgColor').value,
+          icon: document.getElementById('volIconColor').value,
+        }),
+      });
+      const d = await res.json();
+      toast(d.msg || '完成');
+      await fetchSummary();
+    }
+
+    async function quickMmsBubble() {
+      const color = document.getElementById('mmsBubbleColor').value;
+      const res = await fetch('/api/module-quick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mms_bubble', color }),
+      });
+      const d = await res.json();
+      toast(d.msg || '完成');
+      document.getElementById('moduleSelect').value = 'com.android.mms';
+      await fetchSummary();
+    }
+
+    function quickPickModule(action, slot = '') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = () => {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = async () => {
+          const res = await fetch('/api/module-quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, data: r.result, slot }),
+          });
+          const d = await res.json();
+          toast(d.msg || '完成');
+          await fetchSummary();
+        };
+        r.readAsDataURL(f);
+      };
+      input.click();
+    }
+
+    function renderExtras() {
+      const ex = (summary && summary.extras) || { font_name: '', font_size: 0, ringtones: [], lockscreen_files: [] };
+      const fontMeta = document.getElementById('fontMetaText');
+      const fontPrev = document.getElementById('fontPreviewText');
+      if (ex.font_name) {
+        fontMeta.textContent = `已加载: ${ex.font_name} (${(ex.font_size / 1024 / 1024).toFixed(2)} MB)`;
+        const styleId = 'dynamic-theme-font-style';
+        let st = document.getElementById(styleId);
+        if (!st) {
+          st = document.createElement('style');
+          st.id = styleId;
+          document.head.appendChild(st);
+        }
+        st.textContent = `@font-face { font-family: 'ThemeCustomFont'; src: url('${assetUrl('root', ex.font_name)}'); }`;
+        fontPrev.style.fontFamily = "'ThemeCustomFont', sans-serif";
+      } else {
+        fontMeta.textContent = '未设置自定义字体（使用系统默认字体）';
+        fontPrev.style.fontFamily = 'inherit';
+      }
+
+      const lsBox = document.getElementById('lockscreenStatusBox');
+      if (ex.lockscreen_files && ex.lockscreen_files.length > 0) {
+        lsBox.innerHTML = `<span style="font-weight:600;color:var(--text);">已生成/导入 ${ex.lockscreen_files.length} 个锁屏文件：</span>` +
+          ex.lockscreen_files.slice(0, 12).join(', ') +
+          (ex.lockscreen_files.length > 12 ? ` ... 等共 ${ex.lockscreen_files.length} 项` : '');
+      } else {
+        lsBox.textContent = '未生成自定义锁屏包（当前使用静态锁屏壁纸，点右上角“保存并生成锁屏”即可创建）。';
+      }
+
+      if (ex.lockscreen_cfg) {
+        const lc = ex.lockscreen_cfg;
+        document.getElementById('lsClockX').value = lc.clock_x ?? 540;
+        document.getElementById('lsClockY').value = lc.clock_y ?? 280;
+        document.getElementById('lsClockSize').value = lc.clock_size ?? 150;
+        document.getElementById('lsClockColor').value = lc.clock_color || '#ffffff';
+        document.getElementById('lsDateY').value = lc.date_y ?? 440;
+        document.getElementById('lsDateSize').value = lc.date_size ?? 36;
+        document.getElementById('lsDateColor').value = lc.date_color || '#e2f1f5';
+        document.getElementById('lsTagline').value = lc.tagline ?? '向右滑动解锁';
+        document.getElementById('lsTaglineColor').value = lc.tagline_color || '#ffffff';
+        document.getElementById('lsFgX').value = lc.fg_x ?? 0;
+        document.getElementById('lsFgY').value = lc.fg_y ?? 360;
+        document.getElementById('lsFgScale').value = lc.fg_scale ?? 100;
+        document.getElementById('lsSliderEnabled').checked = lc.slider_enabled !== false;
+        document.getElementById('lsXmlEditor').value = lc.xml || '';
+      }
+
+      const slots = [
+        ['ringtone', '来电铃声'],
+        ['notification', '通知 / 短信提示音'],
+        ['alarm', '闹钟铃声'],
+        ['lock', '锁屏 / 充电音效'],
+      ];
+      document.getElementById('ringtoneGrid').innerHTML = slots.map(([slot, label]) => {
+        const matched = (ex.ringtones || []).find(r => r.startsWith(`ringtones/${slot}.`));
+        return `
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px;background:var(--card);display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;font-weight:600;">${label}</span>
+              <button onclick="pickExtraFile('ringtone', '.mp3,.ogg,.wav', '${slot}')">上传音频</button>
+            </div>
+            ${matched
+              ? `<audio controls src="${assetUrl('root', matched)}" style="width:100%;height:32px;"></audio>`
+              : `<span style="font-size:11px;color:var(--muted);">未设置（使用系统默认）</span>`
+            }
+          </div>
+        `;
+      }).join('');
+    }
+
+    function pickExtraFile(kind, accept, slot = '') {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = accept;
+      input.onchange = () => {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = async () => {
+          toast(`正在上传 ${f.name}...`);
+          const res = await fetch('/api/extras/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kind, filename: f.name, slot, data: r.result }),
+          });
+          const d = await res.json();
+          toast(d.msg || '完成');
+          await fetchSummary();
+        };
+        r.readAsDataURL(f);
+      };
+      input.click();
+    }
+
+    async function clearExtras(prefix) {
+      const res = await fetch(`/api/extras?prefix=${encodeURIComponent(prefix)}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast('已清除');
+        await fetchSummary();
+      }
+    }
+
+    function previewLockscreenLive() {
+      if (previewMode !== 'lockscreen') setPreviewMode('lockscreen');
+      else renderPhonePreview();
+    }
+
+    async function saveLockscreenVisual() {
+      const payload = {
+        clock_x: parseInt(document.getElementById('lsClockX').value || '540', 10),
+        clock_y: parseInt(document.getElementById('lsClockY').value || '280', 10),
+        clock_size: parseInt(document.getElementById('lsClockSize').value || '150', 10),
+        clock_color: document.getElementById('lsClockColor').value,
+        date_y: parseInt(document.getElementById('lsDateY').value || '440', 10),
+        date_size: parseInt(document.getElementById('lsDateSize').value || '36', 10),
+        date_color: document.getElementById('lsDateColor').value,
+        tagline: document.getElementById('lsTagline').value,
+        tagline_color: document.getElementById('lsTaglineColor').value,
+        fg_x: parseInt(document.getElementById('lsFgX').value || '0', 10),
+        fg_y: parseInt(document.getElementById('lsFgY').value || '360', 10),
+        fg_scale: parseInt(document.getElementById('lsFgScale').value || '100', 10),
+        slider_enabled: document.getElementById('lsSliderEnabled').checked,
+      };
+      const res = await fetch('/api/lockscreen/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast('已生成 lockscreen/manifest.xml');
+        await fetchSummary();
+        setPreviewMode('lockscreen');
+      }
+    }
+
+    async function saveLockscreenXmlRaw() {
+      const xml = document.getElementById('lsXmlEditor').value;
+      const res = await fetch('/api/lockscreen/xml', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ xml }),
+      });
+      if (res.ok) {
+        toast('已保存锁屏 XML 源码');
+        await fetchSummary();
+      }
+    }
+
+    function setPreviewMode(mode) {
+      previewMode = mode;
+      document.querySelectorAll('.preview-controls button').forEach(b => {
+        b.classList.toggle('active', b.dataset.preview === mode);
+      });
+      renderPhonePreview();
+    }
+
+    function renderPhonePreview() {
+      const screen = document.getElementById('phoneScreen');
+      const sb = document.getElementById('phoneStatusbar');
+      if (!summary || !summary.loaded) {
+        screen.style.backgroundImage = '';
+        screen.innerHTML = '<div style="color:#888;margin:auto;font-size:13px;">请先加载 .itz 主题包</div>';
+        return;
+      }
+
+      if (previewMode === 'lockscreen') {
+        sb.style.color = '#fff';
+        const lsFiles = (summary.extras && summary.extras.lockscreen_files) || [];
+        const hasLsBg = lsFiles.includes('lockscreen/bg.jpg');
+        const hasLsFg = lsFiles.includes('lockscreen/fg.png');
+        const bgUrl = hasLsBg ? assetUrl('root', 'lockscreen/bg.jpg') : assetUrl('root', 'wallpaper/default_lock_wallpaper.jpg');
+        screen.style.backgroundImage = `url("${bgUrl}")`;
+
+        const cx = parseInt(document.getElementById('lsClockX')?.value || '540', 10);
+        const cy = parseInt(document.getElementById('lsClockY')?.value || '280', 10);
+        const csz = parseInt(document.getElementById('lsClockSize')?.value || '150', 10);
+        const ccol = document.getElementById('lsClockColor')?.value || '#ffffff';
+        const dy = parseInt(document.getElementById('lsDateY')?.value || '440', 10);
+        const dsz = parseInt(document.getElementById('lsDateSize')?.value || '36', 10);
+        const dcol = document.getElementById('lsDateColor')?.value || '#e2f1f5';
+        const tag = document.getElementById('lsTagline')?.value || '向右滑动解锁';
+        const tcol = document.getElementById('lsTaglineColor')?.value || '#ffffff';
+        const sliderOn = document.getElementById('lsSliderEnabled')?.checked !== false;
+        const fx = parseInt(document.getElementById('lsFgX')?.value || '0', 10);
+        const fy = parseInt(document.getElementById('lsFgY')?.value || '360', 10);
+        const fsc = parseInt(document.getElementById('lsFgScale')?.value || '100', 10);
+
+        const scaleW = 274 / 1080;
+        const scaleH = 599 / 2400;
+        const fgHtml = hasLsFg
+          ? `<img src="${assetUrl('root', 'lockscreen/fg.png')}" style="position:absolute; left:${fx * scaleW}px; top:${fy * scaleH}px; width:${1080 * fsc / 100 * scaleW}px; pointer-events:none; object-fit:contain;" />`
+          : '';
+        const tagHtml = sliderOn
+          ? `<div style="position:absolute; bottom:32px; left:0; right:0; text-align:center; font-size:12px; color:${tcol}; text-shadow:0 1px 6px rgba(0,0,0,0.5);">${tag}</div>`
+          : '';
+        screen.innerHTML = `
+          ${fgHtml}
+          <div style="position:absolute; left:${(cx / 1080) * 100}%; top:${cy * scaleH}px; transform:translateX(-50%); color:${ccol}; font-size:${Math.max(18, csz * scaleW)}px; font-weight:300; line-height:1; text-shadow:0 2px 12px rgba(0,0,0,0.45); white-space:nowrap;">00:38</div>
+          <div style="position:absolute; left:${(cx / 1080) * 100}%; top:${dy * scaleH}px; transform:translateX(-50%); color:${dcol}; font-size:${Math.max(9, dsz * scaleW)}px; text-shadow:0 1px 8px rgba(0,0,0,0.45); white-space:nowrap;">11月25日 星期三</div>
+          ${tagHtml}
+        `;
+      } else if (previewMode === 'desktop') {
+        sb.style.color = '#fff';
+        screen.style.backgroundImage = `url("${assetUrl('root', 'wallpaper/default_wallpaper.jpg')}")`;
+        const sampleApps = [
+          ['com.tencent.mm.png', '微信'],
+          ['com.tencent.mobileqq.png', 'QQ'],
+          ['com.eg.android.AlipayGphone.png', '支付宝'],
+          ['com.ss.android.ugc.aweme.png', '抖音'],
+          ['tv.danmaku.bili.png', '哔哩哔哩'],
+          ['com.netease.cloudmusic.png', '网易云'],
+          ['com.android.settings.png', '设置'],
+          ['com.android.camera.png', '相机'],
+          ['com.vivo.gallery.png', '相册'],
+          ['com.vivo.browser.png', '浏览器'],
+          ['com.bbk.appstore.png', '应用商店'],
+          ['com.android.bbkcalculator.png', '计算器'],
+          ['com.android.notes.png', '便签'],
+          ['com.bbk.calendar.png', '日历'],
+          ['com.vivo.wallet.png', '钱包'],
+          ['com.bbk.theme.png', 'i主题'],
+        ];
+        screen.innerHTML = `<div class="desktop-grid">${sampleApps.map(([pkg, label]) => `
+          <div class="desktop-app">
+            <div style="position:relative; width:46px; height:46px; border-radius:11px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.18); background:#3b82f6; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px;">
+              <img src="${assetUrl('root', 'launcher/icon_bg_default.png')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;" onerror="this.style.display='none'" />
+              <span style="position:relative;z-index:1;">${label.slice(0,1)}</span>
+              <img src="${assetUrl('root', 'launcher/icon_cover.png')}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:2;" onerror="this.style.display='none'" />
+              <img src="${assetUrl('icons', pkg)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;" onerror="this.style.display='none'" />
+            </div>
+            <span>${label}</span>
+          </div>
+        `).join('')}</div>`;
+      } else if (previewMode === 'control-center') {
+        sb.style.color = '#fff';
+        screen.style.backgroundImage = '';
+        const qsColor = (summary.systemui_colors && summary.systemui_colors.qs_main_color) || '#c5ddaf';
+        screen.innerHTML = `
+          <div style="flex:1; background:rgba(12,14,18,0.94); color:#fff; padding:40px 14px 16px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div style="background:rgba(255,255,255,0.08); border-radius:16px; padding:10px; display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div style="width:36px;height:36px;border-radius:50%;background:${qsColor};display:flex;align-items:center;justify-content:center;color:#111;font-weight:700;">WiFi</div>
+                  <span style="font-size:11px;">已连接</span>
+                </div>
+                <div style="display:flex; gap:10px;">
+                  <div style="width:36px;height:36px;border-radius:50%;background:${qsColor};display:flex;align-items:center;justify-content:center;color:#111;font-size:11px;font-weight:700;">5G</div>
+                  <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-size:11px;">✈</div>
+                </div>
+              </div>
+              <div style="background:rgba(255,255,255,0.08); border-radius:16px; padding:10px; display:flex; flex-direction:column; justify-content:space-between;">
+                <div style="font-size:11px; opacity:0.8;">未在播放</div>
+                <div style="text-align:center; font-size:15px; opacity:0.9;">⏮ ⏯ ⏭</div>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,0.08); border-radius:14px; padding:8px 12px; display:flex; align-items:center; gap:10px;">
+              <img src="${assetUrl('com.android.systemui', 'vivo_qs_focus_mode_personal_on.png')}" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.opacity=0.3" />
+              <span style="font-size:12px;">请勿打扰 / 专注模式</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:4px;">
+              ${[['蓝牙', true], ['省电', false], ['定位', true], ['锁屏', false], ['手电', false], ['截屏', false], ['热点', false], ['录屏', false]].map(([lbl, on]) => `
+                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                  <div style="width:46px;height:46px;border-radius:12px;background:${on ? '#eef2ea' : 'rgba(255,255,255,0.1)'};color:${on ? qsColor : '#fff'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">${lbl.slice(0,1)}</div>
+                  <span style="font-size:10px;opacity:0.8;">${lbl}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        const isDark = previewMode === 'settings-dark';
+        sb.style.color = isDark ? '#fff' : '#111';
+        screen.style.backgroundImage = '';
+        const bgName = isDark ? 'vigour_window_settting_background_dark.png' : 'vigour_window_settting_background_light.png';
+        const rows = [
+          ['ic_settings_wifi_bbk_item.png', 'Wi-Fi'],
+          ['ic_settings_bluetooth_item.png', '蓝牙'],
+          ['ic_settings_game.png', '游戏魔盒'],
+          ['set_fan_light_layer0.png', '散热风扇'],
+          ['ic_system_update.png', '系统管理与升级'],
+          ['ic_about_phone.png', '关于手机'],
+        ];
+        screen.innerHTML = `
+          <div class="settings-screen ${isDark ? 'dark' : 'light'}" style="background-image:url('${assetUrl('vivo', bgName)}'); padding-top:34px;">
+            <div class="settings-header">设置</div>
+            <div class="settings-search">搜索设置项</div>
+            <div class="settings-group">
+              ${rows.map(([icon, label]) => `
+                <div class="settings-row">
+                  <img src="${assetUrl('com.android.settings', icon)}" onerror="this.style.opacity=0.2" />
+                  <span>${label}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function saveMetadata() {
+      const payload = {
+        title: document.getElementById('metaTitle').value,
+        author: document.getElementById('metaAuthor').value,
+        designer: document.getElementById('metaDesigner').value,
+        version: document.getElementById('metaVersion').value,
+        sysromver: document.getElementById('metaRomVer').value,
+        id: document.getElementById('metaId').value,
+        description: document.getElementById('metaDesc').value,
+      };
+      const res = await fetch('/api/metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast('基本信息已保存');
+        await fetchSummary();
+      }
+    }
+
+    function pickAsset(scope, name, accept, allowProcess = false) {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = accept || 'image/*';
+      input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const processIcon = allowProcess && document.getElementById('autoProcessIcon').checked;
+          const res = await fetch('/api/asset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              scope,
+              name,
+              data: reader.result,
+              process_icon: processIcon,
+              size: 192,
+              radius: 0.22,
+            }),
+          });
+          if (res.ok) {
+            toast(`已更新 ${name}`);
+            await fetchSummary();
+          } else {
+            toast('更新失败');
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    function addNewIcon() {
+      const pkg = prompt('请输入应用包名（例如 com.tencent.mm）：');
+      if (!pkg || !pkg.trim()) return;
+      const clean = pkg.trim().endsWith('.png') ? pkg.trim() : `${pkg.trim()}.png`;
+      pickAsset('icons', clean, 'image/*', true);
+    }
+
+    async function createNewItz() {
+      const title = prompt('请输入新主题名称：', '我的 OriginOS 7 主题');
+      if (title === null) return;
+      const author = prompt('请输入作者署名：', 'Designer');
+      if (author === null) return;
+      const res = await fetch('/api/new', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim() || '我的 OriginOS 7 主题', author: author.trim() || 'Designer', sysromver: '17.0' }),
+      });
+      if (res.ok) {
+        toast('已创建空白主题工程');
+        await fetchSummary();
+      } else {
+        toast('创建失败');
+      }
+    }
+
+    async function mapVivoIcons() {
+      const res = await fetch('/api/fix/map-vivo-icons', { method: 'POST' });
+      const data = await res.json();
+      toast(`已补全 ${data.added} 个 vivo 系统应用图标映射`);
+      await fetchSummary();
+    }
+
+    async function patchOrigin6Settings() {
+      const res = await fetch('/api/fix/origin6-settings', { method: 'POST' });
+      const data = await res.json();
+      toast(`已补齐 ${data.added.length} 个 OriginOS 6 设置资源`);
+      await fetchSummary();
+    }
+
+    async function generateDarkBg() {
+      const brightness = parseFloat(document.getElementById('darkBright').value);
+      const contrast = parseFloat(document.getElementById('darkContrast').value);
+      const res = await fetch('/api/fix/dark-bg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brightness, contrast }),
+      });
+      const data = await res.json();
+      toast(`已生成深色背景: ${data.updated.join(', ')}`);
+      await fetchSummary();
+      setPreviewMode('settings-dark');
+    }
+
+    function exportItz() {
+      window.location.href = '/api/export';
+    }
+
+    function downloadChecklist(type) {
+      window.location.href = `/api/export-checklist?type=${encodeURIComponent(type)}`;
+    }
+
+    function exportPhoneRawIcons() {
+      toast('正在通过 ADB 批量提取手机原始图标（约需 20~40 秒，提取完会自动下载 ZIP）...');
+      window.location.href = '/api/adb/export-raw-icons';
+    }
+
+    async function refreshAdbStatus() {
+      const el = document.getElementById('adbStatusText');
+      const res = await fetch('/api/adb/status');
+      const data = await res.json();
+      if (!data.available) {
+        el.textContent = 'ADB 未检测到';
+      } else if (data.devices.length === 0) {
+        el.textContent = 'ADB 就绪（未连接手机）';
+      } else {
+        el.textContent = `已连接手机: ${data.devices.join(', ')}`;
+      }
+    }
+
+    async function scanMissingApps() {
+      const listEl = document.getElementById('missingList');
+      listEl.innerHTML = '<span style="font-size:12px;color:#666;">正在扫描手机应用...</span>';
+      const res = await fetch('/api/adb/scan-missing');
+      const data = await res.json();
+      if (data.error) {
+        listEl.innerHTML = `<span style="font-size:12px;color:#dc2626;">${data.error}</span>`;
+        return;
+      }
+      listEl.innerHTML = `<div style="width:100%;font-size:12px;color:var(--muted);">已安装 ${data.total_installed} 个桌面应用，其中 ${data.missing_count} 个未绘制图标（点击任意一项即可直接上传图标）：</div>` +
+        data.missing.map(({ pkg, label }) => `<span class="missing-chip" title="${pkg}" onclick="pickAsset('icons','${pkg}.png','image/*',true)">${label ? `${label} (${pkg})` : pkg}</span>`).join('');
+    }
+
+    async function quickDialogColor() {
+      const color = document.getElementById('dialogThemeColor').value;
+      const res = await fetch('/api/module-quick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'dialog_color', color }),
+      });
+      const d = await res.json();
+      toast(d.msg || '完成');
+      await fetchSummary();
+    }
+
+    async function quickQsGlyphs() {
+      const res = await fetch('/api/module-quick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'qs_glyphs' }),
+      });
+      const d = await res.json();
+      toast(d.msg || '完成');
+      await fetchSummary();
+    }
+
+    function quickPickSwitchAvatar() {
+      const color = document.getElementById('switchThemeColor').value;
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = () => {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = async () => {
+          const res = await fetch('/api/module-quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'switch_avatar', color, data: r.result }),
+          });
+          const d = await res.json();
+          toast(d.msg || '完成');
+          await fetchSummary();
+        };
+        r.readAsDataURL(f);
+      };
+      input.click();
+    }
+
+    async function quickLockscreenUi(withAvatar) {
+      const color = document.getElementById('lockUiColor').value;
+      if (!withAvatar) {
+        const res = await fetch('/api/module-quick', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'lockscreen_ui', color }),
+        });
+        const d = await res.json();
+        toast(d.msg || '完成');
+        await fetchSummary();
+        return;
+      }
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = () => {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = async () => {
+          const res = await fetch('/api/module-quick', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'lockscreen_ui', color, data: r.result }),
+          });
+          const d = await res.json();
+          toast(d.msg || '完成');
+          await fetchSummary();
+        };
+        r.readAsDataURL(f);
+      };
+      input.click();
+    }
+
+    function promptBaseReplacementPack(onUploaded) {
+      toast('首次使用请选择本地基础底包（主题替换包.itz）');
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.itz,.zip';
+      input.onchange = () => {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = async () => {
+          toast(`正在加载基础底包 ${f.name}...`);
+          const res = await fetch('/api/upload-base-replacement-pack', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: r.result }),
+          });
+          if (res.ok) {
+            toast('基础底包已加载，继续打包...');
+            onUploaded();
+          } else {
+            toast('基础底包加载失败');
+          }
+        };
+        r.readAsDataURL(f);
+      };
+      input.click();
+    }
+
+    async function exportReplacementPack() {
+      toast('正在自动执行 7 步替换包合并，请稍候...');
+      const res = await fetch('/api/export-replacement-pack');
+      if (res.status === 400) {
+        const err = await res.json().catch(() => ({}));
+        if (err.error === 'NEED_BASE_PACK') {
+          promptBaseReplacementPack(() => exportReplacementPack());
+          return;
+        }
+        toast(err.msg || err.error || '导出失败');
+        return;
+      }
+      if (!res.ok) {
+        toast('导出替换包失败');
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '主题替换包.itz';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('已导出免 MT 手操成品：主题替换包.itz');
+    }
+
+    async function pushReplacementPackToPhone() {
+      toast('正在自动合并并直推 主题替换包.itz 到手机...');
+      const res = await fetch('/api/adb/push-replacement-pack', { method: 'POST' });
+      const data = await res.json();
+      if (res.status === 400 && data.error === 'NEED_BASE_PACK') {
+        promptBaseReplacementPack(() => pushReplacementPackToPhone());
+        return;
+      }
+      if (data.ok) {
+        const mb = (data.bytes / 1024 / 1024).toFixed(1);
+        toast(`已免 MT 手操直推到手机 (${mb} MiB): ${data.remote}`);
+      } else {
+        toast(`推送失败: ${data.msg || data.error}`);
+      }
+    }
+
+    async function pushToPhone() {
+      toast('正在导出并推送到手机 Download 目录...');
+      const res = await fetch('/api/adb/push', { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        toast(`已推送到手机: ${data.remote}`);
+      } else {
+        toast(`推送失败: ${data.error}`);
+      }
+    }
+
+    // Upload .itz via file picker or drag & drop
+    function uploadItzFile(file) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        toast(`正在解析 ${file.name}...`);
+        const res = await fetch('/api/load-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, data: reader.result }),
+        });
+        if (res.ok) {
+          toast(`已加载 ${file.name}`);
+          await fetchSummary();
+        } else {
+          toast('加载失败，请确认是否为有效的 .itz 文件');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('itzFileInput').addEventListener('change', e => {
+      if (e.target.files[0]) uploadItzFile(e.target.files[0]);
+    });
+
+    const overlay = document.getElementById('dropOverlay');
+    window.addEventListener('dragover', e => { e.preventDefault(); overlay.style.display = 'flex'; });
+    window.addEventListener('dragleave', e => { if (e.target === overlay) overlay.style.display = 'none'; });
+    window.addEventListener('drop', e => {
+      e.preventDefault();
+      overlay.style.display = 'none';
+      const f = e.dataTransfer.files[0];
+      if (f && (f.name.endsWith('.itz') || f.name.endsWith('.zip'))) {
+        uploadItzFile(f);
+      }
+    });
+
+    function applyUiDarkMode(isDark) {
+      document.body.classList.toggle('dark', isDark);
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) btn.textContent = isDark ? '☀️ 浅色模式' : '🌙 夜间模式';
+      localStorage.setItem('studio_dark_mode', isDark ? '1' : '0');
+    }
+
+    function toggleUiDarkMode() {
+      applyUiDarkMode(!document.body.classList.contains('dark'));
+    }
+
+    // Initialize UI dark mode from saved preference or OS preference
+    applyUiDarkMode(
+      localStorage.getItem('studio_dark_mode') !== null
+        ? localStorage.getItem('studio_dark_mode') === '1'
+        : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    );
+
+    fetchSummary();
+    refreshAdbStatus();
+  </script>
+</body>
+</html>

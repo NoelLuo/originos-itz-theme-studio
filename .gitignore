@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.itz
+*.apk
+*.zip
+*_preview.png
+build_atsuko_*.py
+fix_theme.py
+generate_control_statusbar_icons.py
+generate_settings_icons.py
+亚津子主题_桌面图标/
+vivo第三方主题工具应用等4个文件/
+output_control_statusbar_icons/
+output_settings_icons/
+完成之后的修正/
