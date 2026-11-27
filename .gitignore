@@ -5,6 +5,9 @@ venv/
 *.itz
 *.apk
 *.zip
+*.7z
+*.rar
+*.srt
 *_preview.png
 build_atsuko_*.py
 fix_theme.py

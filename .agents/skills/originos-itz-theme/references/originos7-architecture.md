@@ -45,6 +45,7 @@ An `.itz` file is a standard ZIP archive containing:
 - `BBKLauncher2.apk`'s `VCustomRoundRectLayout` loads `vivo/vigour_dialog_full_light.9.png` (and `_os2.9.png`, `_dark.9.png`, `vigour_dialog_bottom_light.9.png`).
 - Must be 0-`npTc` source `.9.png` (recommended `1034×552` inner canvas + 1px guide border).
 - Pair with matching dialog text/button colors in `vivo/theme_values.xml` and `originui/theme_values.xml`.
+- **Shared-resource trade-off (`VHotspotButton`)**: Some OriginUI bottom sheets (e.g., `com.originui.widget.sheet.w0$a.m()`) reuse `vivo/drawable/vigour_dialog_full_light` as the background of a small top-right dismiss/collapse button. Adding an illustration to `vigour_dialog_full_light.9.png` will also appear miniaturized inside that button—this is a framework-level resource reuse and cannot be split via `.itz` alone.
 
 ---
 
@@ -85,3 +86,27 @@ To eliminate manual file-manager steps on the phone, `itz_engine.build_replaceme
 1. Merges **all files** of the target theme `.itz` into `themeicon/icons.zip`.
 2. Copies the target theme's `preview/` and `wallpaper/` directories into the nested base theme archive (`.dwd/.../T/*.itz`).
 3. Leaves all other template entries intact.
+4. **Known replacement-pack limitation (`com.bbk.launcher2`)**: When applying via the DIY / replacement-pack icon slot (`themeicon/icons.zip`), `BBKTheme.apk`'s `ApplyThemeHelper.copyDiyResFiles()` unpacks `icons.zip` and immediately calls `ApplyThemeUtils.rmFile(DATA_LAUNCHER2_ZIP_PATH)` (deleting `/data/bbkcore/theme/com.bbk.launcher2`), and `copyDiyEntrysFile(..., false, ...)` also skips `com.bbk.launcher2*`. Consequently, `com.bbk.launcher2/theme_values.xml` overrides (such as unread badge `badge_bg_color`) do not take effect through the replacement-pack path; only full-package application via `copyResInfo()` preserves `com.bbk.launcher2`.
+
+---
+
+## 9. Contacts Dialpad & Section Headers (`com.android.contacts`)
+
+- Legacy `com.android.contacts/dialpad_bg.png` is not used by the OriginOS 7 dialpad surface. Real `Contacts.apk` dialpad assets are:
+  - `dialer_bbk_dialpad_background.png` & `dialer_bbk_dialpad_background_stroke.png` (main keypad backdrop)
+  - `dialer_bbk_dialer_bottom_bg.png`, `dialer_bbk_dialer_edittext_bg.png`
+  - 12 pressed-key states: `dialer_bbk_dialer_{0..9,star,pound}_sel.png` (plus `_stroke` variants if needed)
+- Contact list alphabetical group header bars load `com.android.contacts/list_section_header.9.png` (use a transparent or subtle frosted 0-`npTc` source `.9.png` to avoid solid white stripes over custom window backgrounds).
+- Pair with `com.android.contacts/theme_values.xml` keys such as `dialer_call_bg` and `vivo_contacts_list_and_index_header_bg_color`.
+
+---
+
+## 10. Settings Preference Cards, VToolbar & About Phone Banner (`vivo` & `com.android.settings`)
+
+- **Settings preference cards**: Opaque white card strips in Settings sub-pages (e.g., App Info, About Phone) come from 16 source `.9.png` files in `vivo`:
+  - `vigour_preference_{round,top,bottom,unround}_bg_{light,selected_light,dark,selected_dark}.9.png` (must be 0-`npTc` source `.9.png`).
+  - Pair with `com.android.settings/theme_values.xml` keys `preference_card_background_rom15_0` and `originui_vtoolbar_aiosbg_color_*` (for the top-left `VToolbar` circular back button backdrop).
+- **About Phone OriginOS 7 top banner**: `Settings.apk` uses AAPT2-shortened filenames for the About Phone OS card:
+  - `CJo.webp` (`1248×824`, main OS banner card)
+  - `To8.webp` (`1440×995`, backdrop glow layer behind the card)
+  - Write both `.webp` and `.png` variants into `com.android.settings` (alongside readable `rom14..17` fallback names) for reliable matching across builds.
